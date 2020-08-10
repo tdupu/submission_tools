@@ -3,12 +3,10 @@
 import sys
 import json
 
-#https://stackoverflow.com/questions/1054271/how-to-import-a-python-class-that-is-in-a-directory-above
 sys.path.append('..')
 from excel_tools.table_editor import SheetObject
 
 path_to_data = "../../data/algebra-one/20/f/" #rooted from where jupyter was launched
-
 
 def authenticate(user_id, pass1, pass2, newpass):
     R = SheetObject(path_to_data + 'roster.xlsx','roster')
@@ -210,7 +208,7 @@ for i in range(1,6):
 
 
 #this will be read by the PHP file to determine if one should attempt to upload the PDFs
-with open(path_to_data + 'temp.json', 'w') as outfile:
+with open(path_to_data + 'temp2.json', 'w') as outfile:
     json.dump(write_file, outfile)
 
 """
