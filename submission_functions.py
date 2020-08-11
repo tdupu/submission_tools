@@ -1,14 +1,71 @@
 
-
+import json
 import sys
 sys.path.append('..')
 from excel_tools.table_editor import SheetObject
 
-path_to_data = "../../data/algebra-one/20/f/" #rooted from where jupyter was launched
+def tmode(j):
+    """
+    set_test_mode
+    set_testing_mode
+    
+    Seem to be taken or something...
+    """
+    f=open('variables.json','r')
+    variables=json.load(f)
+    f.close()
+    variables['testing'] = j
+    with open('variables.json', 'w') as outfile:
+        json.dump(variables,outfile)
+    if j==0:
+        message = "testing mod off."
+    if j==1:
+        message = "testing mode on."
+    return message
+
+def increment_submission_number():
+    f=open('variables.json','r')
+    variables=json.loads(f.read())
+    f.close()
+    variables['submission_number'] = variables['submission_number']+1
+    f = open('variables.json','w')
+    json.dump(variables,f)
+    f.close()
+    
+    return "submission number: %s. " % variables['submission_number']
+
+def get_submission_count():
+    f=open('variables.json','r')
+    variables=json.loads(f.read())
+    f.close()
+    return variables['submission_number']
+
+def get_CONSTANT_DATA():
+    ff = open('variables.json','r')
+    variables = json.load(ff)
+    ff.close()
+    test_on = variables['testing']
+
+    if test_on ==1:
+        f = open('testing.json','r')
+        
+    if test_on==0:
+        f = open('constants.json','r')
+        
+    CONSTANT_DATA = json.load(f)
+    f.close()
+    return CONSTANT_DATA
+    
+def get_path_to_data():
+    CONSTANT_DATA = get_CONSTANT_DATA()
+    return CONSTANT_DATA['path_to_data']
 
 def authenticate(user_id, pass1, pass2, newpass):
-    R = SheetObject(path_to_data + 'roster.xlsx','roster')
-    students = R.get_entries({'netid':user_id})
+    CONSTANT_DATA = get_CONSTANT_DATA()
+    path_to_data = CONSTANT_DATA['path_to_data']
+    roster_name = CONSTANT_DATA['roster_name']
+    R = SheetObject(path_to_data + roster_name,'roster')
+    students = R.get({'netid':user_id})
     n = len(students)
     authenticated = 0
     if n==0:
@@ -38,7 +95,10 @@ def authenticate(user_id, pass1, pass2, newpass):
     return message, authenticated
 
 def is_valid_assignment(assignment, problem, timestamp, check_due_date=False):
-    A = SheetObject(path_to_data+'roster.xlsx','assignments')
+    CONSTANT_DATA = get_CONSTANT_DATA()
+    path_to_data = CONSTANT_DATA['path_to_data']
+    roster_name = CONSTANT_DATA['roster_name']
+    A = SheetObject(path_to_data+roster_name,'assignments')
     query = {'assignment':assignment, 'problem':problem}
     entries = A.get(query)
     n=len(entries)
@@ -53,16 +113,20 @@ def submit_problem(user_id,assignment,problem,timestamp, check_due_date=False):
     """
     
     """
-    S = SheetObject(path_to_data + 'roster.xlsx','submissions')
-    query = {'user_id':user_id, 'assignment':assignment,'problem':problem}
-    if is_valid_assignment(query):
+    CONSTANT_DATA = get_CONSTANT_DATA()
+    path_to_data = CONSTANT_DATA['path_to_data']
+    roster_name = CONSTANT_DATA['roster_name']
+    S = SheetObject(path_to_data + roster_name,'submissions')
+    #query = {'user_id':user_id, 'assignment':assignment,'problem':problem}
+    if is_valid_assignment(user_id,assignment,problem):
         
         new_entry = {}
         new_entry['user_id'] = user_id
         new_entry['assignment'] = assignment
         new_entry['problem'] = problem
-        new_entry['submission_number'] = timestamp
+        new_entry['submission_number'] = get_submission_count()
         new_entry['submission_time'] = timestamp
+        new_entry['new_submission']=1
         
         old_entries = S.get(query)
         n = len(old_entries)
@@ -93,11 +157,21 @@ def submit_problem(user_id,assignment,problem,timestamp, check_due_date=False):
                 submission number %s: submission number %s for assignment %s, problem %s will be overwritten. Passing to PDF recorder... <br>
                 """ % (timestamp, old_entries['submission_number'],assignment,problem)
                 write_file = 1
+                
         else:
-            message = "Oh boy... multiple submissions for this problem exist in the database! <br> Please alert Professor Dupuy that the database is recording multiple entries. <br> ")
+            message = "Oh boy... multiple submissions for this problem exist in the database! <br> Please alert Professor Dupuy that the database is recording multiple entries. <br> "
             write_file =0
-        
-        return message,write_file
+            
+        if write_file ==1:
+            increment_submission_number()
+    
+    else:
+        message = """
+        Submission for assignment %s, problem %s rejected. This is not a valid submission. <br>
+        """ % (assignment,problem)
+        write_file = 0
+            
+    return message,write_file
 
 def is_valid_review(user_id,submission_number,score,review,timestamp):
     """
@@ -109,12 +183,14 @@ def is_valid_review(user_id,submission_number,score,review,timestamp):
     if a previous review exists and its not the end of the day, write it.
     if a previous review exists and it its past the end of the day, kill it.
     """
-    
-    
-    S=SheetObject(path_to_data + "roster.xlsx", "submissions")
+    CONSTANT_DATA = get_CONSTANT_DATA()
+    path_to_data = CONSTANT_DATA['path_to_data']
+    roster_name = CONSTANT_DATA['roster_name']
+    S=SheetObject(path_to_data + roster_name, "submissions")
     entries = S.get({"submission_number":submission_number})
     n = len(entries)
     j=0 # returns reviewer number or zero
+    message = '' #holy moly if you don't initialize this string it gets mad
     if n==0:
         message = "Review for submission number %s rejected. Invalid submission number. <br>" % submission_number
         j=0
@@ -123,10 +199,8 @@ def is_valid_review(user_id,submission_number,score,review,timestamp):
         old_entry = submission #keep a copy for the replace function later
         reviewer1 = submission['reviewer1']
         reviewer2 = submission['reviewer1']
-        is_locked = [relevant_sub['review1_locked'],relevant_sub['review2_locked']]
+        is_locked = [submission['review1_locked'],submission['review2_locked']]
     
-    #we need the user to be a reviewer
-    if j!=0:
         if user_id == reviewer1:
             j=1
         elif user_id == reviewer2:
@@ -136,14 +210,16 @@ def is_valid_review(user_id,submission_number,score,review,timestamp):
             Review for submission number %s rejected. Not a valid reviewer. <br>
             """ % submission_number
             j=0
-        else:
-            if is_locked[j-1]:
-                j=0
-                message = """
-                Review for submission number %s rejected. Submission is closed. <br>
-                """ % submission_number
+     
+    if j!=0 and is_locked[j-1]:
+        j=0
+        message = """
+        Review for submission number %s rejected. Submission is closed. <br>
+        """ % submission_number
+    
     if j!=0:
-        try score = int(score):
+        try:
+            score = int(score)
             if not (0<=score and score <= 10):
                 j=0
                 message="""
@@ -154,6 +230,7 @@ def is_valid_review(user_id,submission_number,score,review,timestamp):
             message = """
             Review for submission number %s rejected. Score is not a valid integer. <br>
             """ % submission_number
+        
         if review == '':
             j=0
             message ="""
@@ -161,6 +238,29 @@ def is_valid_review(user_id,submission_number,score,review,timestamp):
             """
     
     return message, j
+    
+def write_review(user_id,submission_number,score,review,timestamp):
+    message,j=is_valid_review(user_id,submission_number,score,review,timestamp)
+        
+    if j!=0: #write the review
+        CONSTANT_DATA = get_CONSTANT_DATA()
+        path_to_data = CONSTANT_DATA['path_to_data']
+        roster_name = CONSTANT_DATA['roster_name']
+        S=SheetObject(path_to_data + roster_name, "submissions")
+        
+        old_entry = S.get({'submission_number':submission_number})[0]
+        new_entry = old_entry
+        
+        new_entry['review%s' % j] = review
+        new_entry['score%s' % j] = int(score)
+        new_entry['review%s_timestamp' % j] = timestamp
+        new_entry['new_review%s' % j] = 1
+        S.replace(old_entry,new_entry)
+        S.save()
+            
+    return message
+    
+
 
 #def write_review(user_id,submission_number,score,review,timestamp):
 #    S = SheetObject(path_to_data + "roster.xlsx", "submissions")

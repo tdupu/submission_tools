@@ -1,12 +1,19 @@
 #!/usr/bin/env python
 
-
 import json
 import sys
+
 sys.path.append('..')
 from excel_tools.table_editor import SheetObject
 
-path_to_data = "../../data/algebra-one/20/f/" #rooted from where jupyter was launched
+from submission_functions import *
+
+"""
+NOTE TO USERS:
+modify constant.json with your information.
+"""
+
+path_to_data = get_path_to_data() #rooted from where jupyter was launched
 
 from submission_functions import *
 
@@ -17,6 +24,7 @@ START PROCESSING DATA
 temp_filename = "temp.json"
 f = open(path_to_data+temp_filename,'r')
 data=json.loads(f.read())
+f.close()
 
 #startwriting down things
 user_id = data['user_id']
@@ -89,6 +97,8 @@ if authenticated==1:
         review = data['review%s' % i]
         score = data['score%s' % i]
         
+        message = write_review(user_id,submission_number,review,score,timestamp)
+        '''
         message, j = is_valid_review(user_id,submission_number,review,score,timestamp)
         
         old_entry = S.get({'submission_number':submission_number})
@@ -100,13 +110,15 @@ if authenticated==1:
             new_entry['review%s_timestamp' % j] = timestamp
             S.replace(old_entry,new_entry)
             S.save()
+        '''
         
         output_message = output_message + message
 
 #temp2.json will be read by the upload.php
 #used to determine if one should attempt to upload the PDFs
 with open(path_to_data + 'temp2.json', 'w') as outfile:
-    json.dump(files_to_write, outfile)
+    files_to_write_j=json.dumps(files_to_write)
+    outfile.write(files_to_write_j)
 
 print(output_message)
 
