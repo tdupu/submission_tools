@@ -117,49 +117,69 @@ def submit_problem(user_id,assignment,problem,timestamp, check_due_date=False):
     path_to_data = CONSTANT_DATA['path_to_data']
     roster_name = CONSTANT_DATA['roster_name']
     S = SheetObject(path_to_data + roster_name,'submissions')
-    #query = {'user_id':user_id, 'assignment':assignment,'problem':problem}
-    if is_valid_assignment(user_id,assignment,problem):
+    query = {'netid':user_id, 'assignment':assignment,'problem':problem}
+    if is_valid_assignment(assignment,problem,timestamp):
         
-        new_entry = {}
-        new_entry['user_id'] = user_id
-        new_entry['assignment'] = assignment
-        new_entry['problem'] = problem
-        new_entry['submission_number'] = get_submission_count()
-        new_entry['submission_time'] = timestamp
-        new_entry['new_submission']=1
-        
+
         old_entries = S.get(query)
         n = len(old_entries)
         write_file = 1
         
         if n==0:
+            new_entry = {}
+            new_entry['netid'] = user_id
+            new_entry['assignment'] = assignment
+            new_entry['problem'] = problem
+            new_entry['submission_number'] = get_submission_count()
+            new_entry['submission_time'] = timestamp
+            new_entry['new_submission']=1
+            new_entry['submission_locked']=0
             S.append(new_entry)
             S.save()
             message = """
-            submission number %s: assignment: %s, problem %s, <br> Passing to PDF recorder... <br>.
+            Submission number %s created for assignment %s, problem %s. This is new. <br> Passing to PDF recorder... <br>.
             """ % (timestamp, assignment, problem)
             write_file = 1
             
         elif n==1:
             old_entry = old_entries[0]
-            is_locked = old_entries['submission_locked']
+            
+            #The trickiest fucking bug in the world:
+            #new_entry = old_entry
+            
+            #you need to make a new blank dictionary...
+            #...otherwise it just points to the old one
+            new_entry = {}
+            for key in S.set_of_keys:
+                new_entry[key] = old_entry[key]
+            
+            new_submission_number = get_submission_count()
+            new_entry['netid'] = user_id
+            new_entry['assignment'] = assignment
+            new_entry['problem'] = problem
+            new_entry['submission_number'] = new_submission_number
+            new_entry['submission_time'] = timestamp
+            new_entry['new_submission']=1
+            new_entry['submission_locked']=0
+            
+            is_locked = old_entry['submission_locked'] #bug: entries -> entry
+            
             if is_locked ==1:
                 message = """
-                Submission for assignment %s, problem %s is locked because it has been passed to reviewers or is past the due date.
-                <br> If this message is incorrect please contact Professor Dupuy. <br>
+                Submission for assignment %s, problem %s was rejected. This submission is  now locked. (It has been passed to reviewers or is past the due date) <br>
                 """ % (assignment,problem)
                 write_file =0
                 
-            elif is_locked ==0:
+            if is_locked ==0:
                 S.replace(old_entry,new_entry)
                 S.save()
                 message = """
-                submission number %s: submission number %s for assignment %s, problem %s will be overwritten. Passing to PDF recorder... <br>
-                """ % (timestamp, old_entries['submission_number'],assignment,problem)
+                Submission number %s for assignment %s, problem %s was created. Submission number %s has been overwritten. Passing to PDF writer...<br>
+                """ % (new_submission_number, old_entry['submission_number'],assignment,problem)
                 write_file = 1
                 
         else:
-            message = "Oh boy... multiple submissions for this problem exist in the database! <br> Please alert Professor Dupuy that the database is recording multiple entries. <br> "
+            message = "The database is corrupted! Multiple submissions for this problem exist in the database! Please alert sys admin that the database is recording multiple entries! <br> "
             write_file =0
             
         if write_file ==1:
@@ -249,12 +269,32 @@ def write_review(user_id,submission_number,score,review,timestamp):
         S=SheetObject(path_to_data + roster_name, "submissions")
         
         old_entry = S.get({'submission_number':submission_number})[0]
-        new_entry = old_entry
         
+        #NEVER DO THIS WITH DICTIONARIES
+        #new_entry = old_entry
+        new_entry = {}
+        for key in S.keys:
+            new_entry[key] = old_entry[key]
+        
+        
+        #With the old command...
+        #commands below just modify old_entry in memory.
         new_entry['review%s' % j] = review
-        new_entry['score%s' % j] = int(score)
+        new_entry['reviewer%s_score' % j] = int(score) #not scorej, holy shit this bug took me forever.
         new_entry['review%s_timestamp' % j] = timestamp
         new_entry['new_review%s' % j] = 1
+        
+        #debuggin
+        #A=set(list(new_entry.keys()))
+        #B=set(list(old_entry.keys()))
+        #print(B.issubset(A))
+        #
+        #for a in list(old_entry):
+        #    print(a)
+        #
+        #for b in list(new_entry):
+        #    print(b)
+        #no such entry old_entry
         S.replace(old_entry,new_entry)
         S.save()
             
