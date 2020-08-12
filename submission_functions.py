@@ -1,8 +1,25 @@
+#!/usr/bin/env python3
+
+"""
+Some of the strings in this file have issues is we don't run python3.
+
+"""
 
 import json
 import sys
-sys.path.append('..')
-from excel_tools.table_editor import SheetObject
+#sys.path.append('../excel_tools')
+#
+#to get these paths I used the pwd unix command.
+#
+sys.path.append('/Users/taylordupuy/Documents/web-development/dev/excel_tools')
+
+my_system_path ='/Users/taylordupuy/Documents/web-development/dev/submission_tools/'
+path_to_variables_j = my_system_path + 'variables.json'
+path_to_constants_j = my_system_path + 'constants.json'
+path_to_testing_j = my_system_path + 'testing.json'
+
+from table_editor import SheetObject
+
 
 def tmode(j):
     """
@@ -11,11 +28,11 @@ def tmode(j):
     
     Seem to be taken or something...
     """
-    f=open('variables.json','r')
+    f=open(path_to_variables_j,'r')
     variables=json.load(f)
     f.close()
     variables['testing'] = j
-    with open('variables.json', 'w') as outfile:
+    with open(path_to_variables_j, 'w') as outfile:
         json.dump(variables,outfile)
     if j==0:
         message = "testing mod off."
@@ -24,33 +41,33 @@ def tmode(j):
     return message
 
 def increment_submission_number():
-    f=open('variables.json','r')
+    f=open(path_to_variables_j,'r')
     variables=json.loads(f.read())
     f.close()
     variables['submission_number'] = variables['submission_number']+1
-    f = open('variables.json','w')
+    f = open(path_to_variables_j,'w')
     json.dump(variables,f)
     f.close()
     
     return "submission number: %s. " % variables['submission_number']
 
 def get_submission_count():
-    f=open('variables.json','r')
+    f=open(path_to_variables_j,'r')
     variables=json.loads(f.read())
     f.close()
     return variables['submission_number']
 
 def get_CONSTANT_DATA():
-    ff = open('variables.json','r')
+    ff = open(path_to_variables_j,'r')
     variables = json.load(ff)
     ff.close()
     test_on = variables['testing']
 
     if test_on ==1:
-        f = open('testing.json','r')
+        f = open(path_to_testing_j,'r')
         
     if test_on==0:
-        f = open('constants.json','r')
+        f = open(path_to_constants_j,'r')
         
     CONSTANT_DATA = json.load(f)
     f.close()

@@ -1,7 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 #import json
 #import sys
+
 
 #the following gives an error but it looks like we don't need it.
 #sys.path.append('..')
