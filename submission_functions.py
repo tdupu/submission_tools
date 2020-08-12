@@ -190,8 +190,11 @@ def submit_problem(user_id,assignment,problem,timestamp, check_due_date=False):
         Submission for assignment %s, problem %s rejected. This is not a valid submission. <br>
         """ % (assignment,problem)
         write_file = 0
-            
-    return message,write_file
+        
+    dataentry = {}
+    dataentry["uploadOk"] = write_file
+    dataentry["submission_number"]=new_submission_number
+    return message,dataentry
 
 def is_valid_review(user_id,submission_number,score,review,timestamp):
     """

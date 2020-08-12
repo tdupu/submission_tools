@@ -57,8 +57,11 @@ def test_submit_problem_manual():
     query = {'netid':user_id, 'assignment':assignment,'problem':problem}
     old_entries = S.get(query)
     old_entry = old_entries[0]
+    
+    #this is the shitty way to make a new dictionary
     new_entry = old_entry
     new_submission_number = get_submission_count()
+    #one would think these modifications below don't matter...
     new_entry['netid'] = user_id
     new_entry['assignment'] = assignment
     new_entry['problem'] = problem
@@ -66,9 +69,13 @@ def test_submit_problem_manual():
     new_entry['submission_time'] = timestamp
     new_entry['new_submission']=1
     new_entry['submission_locked']=0
-    feedback_entries = S.get(old_entry)
     
-    assert feedback_entries == old_entries
+    #the modifications modify old_entry
+    #and the query is actually empty.
+    feedback_entries = S.get(old_entry)
+    print(feedback_entries)
+    
+    assert len(feedback_entries) == 0
     
     #message,write_file = submit_problem(user_id,assignment,problem,timestamp)
     #print(message)
@@ -85,6 +92,7 @@ def test_submit_problem_manual4():
     query = {'netid':user_id, 'assignment':assignment,'problem':problem}
     old_entries = S.get(query)
     old_entry = old_entries[0]
+    #this is the incorrect way to make a new dictionary
     new_entry = old_entry
     new_submission_number = get_submission_count()
     new_entry['netid'] = user_id
@@ -110,6 +118,8 @@ def test_submit_problem_manual5():
     timestamp = 129837
     query = {'netid':user_id, 'assignment':assignment,'problem':problem}
     old_entries = S.get(query)
+    
+    #This is the correct way to make a new dictionary.
     old_entry = old_entries[0]
     new_entry = {}
     for key in S.set_of_keys:
@@ -125,7 +135,7 @@ def test_submit_problem_manual5():
     feedback_entries = S.get(old_entry)
     #according to the error this has no entries
     #THE MEMORY POINTS TO THE OLD ONE!
-    assert old_entry == new_entry
+    assert not old_entry == new_entry
     
 def test_submit_problem_manual3():
     CONSTANT_DATA = get_CONSTANT_DATA()
@@ -191,9 +201,10 @@ def test_submit_problem():
     assignment = 1
     problem = 1
     timestamp = 129837
-    message,write_file = submit_problem(user_id,assignment,problem,timestamp)
+    message,dataEntry = submit_problem(user_id,assignment,problem,timestamp)
     #print(message)
-    assert write_file==1
+    print(dataEntry)
+    assert dataEntry['uploadOk']==1
     
 def test_is_valid_review1():
     submission_number = 3

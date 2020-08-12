@@ -1,11 +1,23 @@
 #!/usr/bin/env python
 
+#import json
+#import sys
+
+#the following gives an error but it looks like we don't need it.
+#sys.path.append('..')
+#from excel_tools.table_editor import SheetObject
+#from submission_functions import *
+
+#JSON requires double quotes!
+
+"""
+Different things happen depending on if you run python3 or python on this file.
+"""
+
+
 import json
 import sys
-
 sys.path.append('..')
-from excel_tools.table_editor import SheetObject
-
 from submission_functions import *
 
 """
@@ -42,6 +54,13 @@ message,authenticated = authenticate(user_id,pass1,pass2,newpass)
 output_message = output_message + message
 files_to_write = {1:0,2:0,3:0,4:0,5:0,6:0}
 
+
+#for processing if the file should even be considered for upload
+temp_filename2 = "temp2.json"
+f2 = open(path_to_data+temp_filename2,'r')
+data2=json.load(f2)
+f2.close()
+
 if authenticated==1:
     """
     PROCESS SUBMISSIONS
@@ -53,30 +72,47 @@ if authenticated==1:
     <br>
     """
     output_message = output_message + submission_message
-
+    
+    data3 = {}
+    
     for i in range(1,6):
         query = {}
-        submission_number = data['timestamp']
+        submission_number = get_submission_count()
         assignment = data['assignment%s' % i]
         problem = data['assignment%s' % i]
         timestamp = data['timestamp']
         
-        if is_valid_assignment(assignment,problem,timestamp)
+        dataEntry={}
+        
+        if data2[i] ==0:
+            message = """
+            The file associated with assignment %s, problem %s is not a valid PDF. <br>
+            \n
+            """ % (assignment,problem)
+            dataEntry = {"uploadOk":0,"submission_number":submission_number}
+        
+        elif is_valid_assignment(assignment,problem,timestamp):
+        #if is_valid_assignment(assignment,problem,timestamp):
             query['user_id'] = user_id
             query['assignment'] = assignment
             query['problem'] = problem
-            is_allowed, message = submit_problem(user_id,assignment,problem,timestamp)
-            files_to_write[i]=is_allowed
+            message,dataEntry = submit_problem(user_id,assignment,problem,timestamp)
         
         else:
             message = """
             assignment %s, problem %s is not a valid problem or is past the due date. <br>
             \n
             """ % (assignment,problem)
-            files_to_write[i]=0
-            
-        output_message = output_message + message.
-
+            dataEntry = {"uploadOk":0,"submission_number":submission_number}
+        
+        data3[i] = dataEntry
+        output_message = output_message + message
+        
+    #temp3.json will be read by the upload.php
+    #used to determine if one should attempt to upload the PDFs
+    with open(path_to_data + 'temp3.json', 'w') as outfile:
+        json.dump(data3,outfile)
+        
     
     """
     PROCESS REVIEWS
@@ -113,12 +149,6 @@ if authenticated==1:
         '''
         
         output_message = output_message + message
-
-#temp2.json will be read by the upload.php
-#used to determine if one should attempt to upload the PDFs
-with open(path_to_data + 'temp2.json', 'w') as outfile:
-    files_to_write_j=json.dumps(files_to_write)
-    outfile.write(files_to_write_j)
 
 print(output_message)
 
