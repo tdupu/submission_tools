@@ -51,10 +51,10 @@ output_message = ""
 AUTHENTICATE USER
 """
 
+#print(data)
+
 message,authenticated = authenticate(user_id,pass1,pass2,newpass)
 output_message = output_message + message
-files_to_write = {1:0,2:0,3:0,4:0,5:0,6:0}
-
 
 #for processing if the file should even be considered for upload
 temp_filename2 = "temp2.json"
@@ -74,18 +74,27 @@ if authenticated==1:
     """
     output_message = output_message + submission_message
     
+    #dictionary we are throwing back to PHP
     data3 = {}
     
     for i in range(1,6):
         query = {}
         submission_number = get_submission_count()
         assignment = data['assignment%s' % i]
-        problem = data['assignment%s' % i]
+        problem = data['problem%s' % i]
         timestamp = data['timestamp']
+        
+        """
+        print('<br>')
+        print('assignment %s,problem %s, timestamp:%s' % (assignment,problem,timestamp))
+        print('<br>')
+        print('data2 (file information):')
+        print(data2)
+        """
         
         dataEntry={}
         
-        if data2[i] ==0:
+        if data2[str(i)]==0:
             message = """
             The file associated with assignment %s, problem %s is not a valid PDF. <br>
             \n
@@ -127,7 +136,6 @@ if authenticated==1:
     output_message = output_message + review_message
     
     for i in range(1,11):
-        j=0
         user_id = data['user_id']
         timestamp = data['timestamp']
         submission_number = data['subnumber%s' % i] #of the review
@@ -135,19 +143,6 @@ if authenticated==1:
         score = data['score%s' % i]
         
         message = write_review(user_id,submission_number,review,score,timestamp)
-        '''
-        message, j = is_valid_review(user_id,submission_number,review,score,timestamp)
-        
-        old_entry = S.get({'submission_number':submission_number})
-        new_entry = old_entry
-
-        if j!=0:
-            new_entry['review%s' % j] = review
-            new_entry['score%s' % j] = int(score)
-            new_entry['review%s_timestamp' % j] = timestamp
-            S.replace(old_entry,new_entry)
-            S.save()
-        '''
         
         output_message = output_message + message
 

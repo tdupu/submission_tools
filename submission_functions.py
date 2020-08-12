@@ -116,8 +116,38 @@ def is_valid_assignment(assignment, problem, timestamp, check_due_date=False):
     path_to_data = CONSTANT_DATA['path_to_data']
     roster_name = CONSTANT_DATA['roster_name']
     A = SheetObject(path_to_data+roster_name,'assignments')
+    
+    """
+    print( "roster name: %s <br>" % roster_name)
+    print( "path_to_data: %s <br>" % path_to_data )
+    print( "all assignments:" )
+    for x in A.get({}):
+        print(x)
+        print( "<br>" )
+    """
+    
+    """
+    y=A.get({})[8]['assignment']
+    print('y is %s <br>' % y )
+    print('y had type %s <br>' % type(y))
+    print('assignment has type %s <br>' % type(assignment) )
+    print(type(y)==type(assignment))
+    print(type(y)==int)
+    print(type(assignment)==int)
+    """
+    assignment = int(assignment)
+    problem = int(problem)
+    
     query = {'assignment':assignment, 'problem':problem}
     entries = A.get(query)
+    
+    """
+    for entry in entries:
+        print(entry)
+        print("<br>")
+        print(len(entries))
+    """
+    
     n=len(entries)
     if n==1:
         return True
