@@ -2,15 +2,13 @@
 
 """
 Some of the strings in this file have issues is we don't run python3.
-
 """
 
 import json
 import sys
 #sys.path.append('../excel_tools')
-#
 #to get these paths I used the pwd unix command.
-#
+
 sys.path.append('/Users/taylordupuy/Documents/web-development/dev/excel_tools')
 
 my_system_path ='/Users/taylordupuy/Documents/web-development/dev/submission_tools/'
