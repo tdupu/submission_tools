@@ -96,9 +96,9 @@ def authenticate(user_id, pass1, pass2, newpass):
             if pass1 == pass2 and len(newpass) >0:
                 new_entry = old_entry
                 new_entry['password'] = newpass
-                message = "new password has been set... <br> "
+                message = "new password has been set. <br> "
             else:
-                message = "user_id and password match... <br> "
+                message = "<i> %s upload report </i> <br>" % user_id
         else:
             authenticated = 0
             message = "invalid user_id and password. <br>"
@@ -106,7 +106,7 @@ def authenticate(user_id, pass1, pass2, newpass):
     if n>2:
         authenticated = 0
         message = """
-        invalid user_id and password. (Something unusual happened. Please contact the instructor.) <br>
+        invalid user_id and password. (multiple users! please copy-paste this entire upload report in an email to tdupuy@uvm.edu.) <br>
         """
         
     return message, authenticated
@@ -203,7 +203,7 @@ def submit_problem(user_id,assignment,problem,timestamp, check_due_date=False):
             S.append(new_entry)
             S.save()
             message = """
-            Submission number %s created for assignment %s, problem %s. This is new. <br> Passing to PDF recorder... <br>.
+            *submission %s, assignment %s, problem %s created. new. <br>
             """ % (timestamp, assignment, problem)
             write_file = 1
             
@@ -232,7 +232,7 @@ def submit_problem(user_id,assignment,problem,timestamp, check_due_date=False):
             
             if is_locked ==1:
                 message = """
-                Submission for assignment %s, problem %s was rejected. This submission is  now locked. (It has been passed to reviewers or is past the due date) <br>
+                *assignment %s, problem %s rejected. locked. <br>
                 """ % (assignment,problem)
                 write_file =0
                 
@@ -240,12 +240,14 @@ def submit_problem(user_id,assignment,problem,timestamp, check_due_date=False):
                 S.replace(old_entry,new_entry)
                 S.save()
                 message = """
-                Submission number %s for assignment %s, problem %s was created. Submission number %s has been overwritten. Passing to PDF writer...<br>
-                """ % (new_submission_number, old_entry['submission_number'],assignment,problem)
+                *submission %s, assignment %s, problem %s created. <br>
+                submission %s overwritten. <br>
+                """ % (new_submission_number,assignment,problem,old_entry['submission_number'])
                 write_file = 1
                 
         else:
-            message = "The database is broken! Multiple submissions for this problem exist in the database! Please send this error message to the person running this course. <br> "
+            message = """
+            *assigment %s, problem %s rejected. multiple entries in database. contact instructor with this message and copy-paste this message. <br> """
             write_file =0
             
         if write_file ==1:
@@ -253,7 +255,7 @@ def submit_problem(user_id,assignment,problem,timestamp, check_due_date=False):
     
     else:
         message = """
-        Submission for assignment %s, problem %s rejected. This is not a valid submission. <br>
+        *assignment %s, problem %s rejected. not a valid submission. <br>
         """ % (assignment,problem)
         write_file = 0
         
@@ -281,12 +283,17 @@ def is_valid_review(user_id,submission_number,score,review,timestamp):
     S=SheetObject(path_to_data + roster_name, "submissions")
     entries = S.get({"submission_number":submission_number})
     n = len(entries)
-    j=0 # returns reviewer number or zero
+    j=-1 # returns reviewer number or zero
     message = '' #holy moly if you don't initialize this string it gets mad
-    if n==0:
-        message = "Review for submission number %s rejected. Invalid submission number. <br>" % submission_number
+    
+    if review == '':
         j=0
-    if n==1:
+        message =""
+    
+    if n==0 and j!=0:
+        message = "*review of %s rejected. invalid submission number. <br>" % submission_number
+        j=0
+    if n==1 and j!=0:
         submission = entries[0]
         old_entry = submission #keep a copy for the replace function later
         reviewer1 = submission['reviewer1']
@@ -299,35 +306,29 @@ def is_valid_review(user_id,submission_number,score,review,timestamp):
             j=2
         else:
             message = """
-            Review for submission number %s rejected. Not a valid reviewer. <br>
+            *review of %s rejected. incorrect reviewer. <br>
             """ % submission_number
             j=0
      
-    if j!=0 and is_locked[j-1]:
+    if j>0 and is_locked[j-1]:
         j=0
         message = """
-        Review for submission number %s rejected. Submission is closed. <br>
+        *review of %s rejected. closed. <br>
         """ % submission_number
     
-    if j!=0:
+    if j>0:
         try:
             score = int(score)
             if not (0<=score and score <= 10):
                 j=0
                 message="""
-                Review for submission number %s rejected. Score must be between 0 and 10. <br>
+                *review of %s rejected. score must be between 0 and 10. <br>
                 """ % submission_number
         except:
             j=0
             message = """
-            Review for submission number %s rejected. Score is not a valid integer. <br>
+            review of %s rejected. score must be an integer. <br>
             """ % submission_number
-        
-        if review == '':
-            j=0
-            message ="""
-            Review for submission number %s was rejected. Empty review. <br>
-            """
     
     return message, j
     

@@ -22,7 +22,7 @@ sys.path.append('..')
 from submission_functions import *
 
 """
-NOTE TO USERS:
+note to devs:
 modify constant.json with your information.
 """
 
@@ -80,26 +80,76 @@ if authenticated==1:
     for i in range(1,6):
         query = {}
         submission_number = get_submission_count()
-        assignment = data['assignment%s' % i]
-        problem = data['problem%s' % i]
-        timestamp = data['timestamp']
         
         """
-        print('<br>')
+        There was some massive crude-ass debugging that went on here.
+        I'm a terrible person.
+        As it turns out, the empty string is not an integer and this is what happens when the variables are not set.
+        """
+        
+        
+        #print(" <br> <br> submission number (top of loop): %s <br>" % submission_number)
+        
+        #print(" dumping data (looking for assignment and problem values): <br>")
+        #for key in data.keys():
+        #    print( "%s <br>" % data[key] )
+        #print(data)
+        #print('<br>')
+        
+        #xx=int(mydata) #this throws an error.
+        """
+        if isinstance(mydata,str):
+            print("its a string! <br>")
+        print( "is digit: %s <br>" % mydata.isdigit())
+        print( "first character: %s <br>" % mydata[0] ) #this throws an error
+        print( "what it looks like after concat:" + mydata + "<br>")
+        try:
+            xx=int(mydata)
+            print("its an integer now! <br>")
+        except:
+            print("it throws an error when I do int(mydata) <br>")
+        """
+        """
+        try:
+            xx=int(assignment)
+            yy=int(problem)
+            zz=int(timestamp)
+            print("they are all integers now! <br>")
+        except:
+            print("now I get an error")
+        """
+        assignment = data['assignment%s' % i]
+        problem = data['problem%s' % i]
+        timestamp = int(data['timestamp'])
+        
+        #The empty string does not convert to an integer
+        try:
+            assignment = int(assignment) #PHP exports ints as strings for some reason.
+            problem = int(problem)
+        except:
+            pass
+            #do nothing
+        
+        """
         print('assignment %s,problem %s, timestamp:%s' % (assignment,problem,timestamp))
         print('<br>')
-        print('data2 (file information):')
+        print('data2 (file information): <br>')
         print(data2)
         """
         
         dataEntry={}
         
+        #reminder: data2 contains testing if a file has an empty string or not.
         if data2[str(i)]==0:
-            message = """
-            The file associated with assignment %s, problem %s is not a valid PDF. <br>
-            \n
-            """ % (assignment,problem)
+            message = ""
+            #message = """
+            #*assignment %s, problem %s rejected. not a valid PDF. <br>
+            #\n
+            #""" % (assignment,problem)
+            #print("submission_number %s <br>" % submission_number )
             dataEntry = {"uploadOk":0,"submission_number":submission_number}
+            
+            #The next step checks to see if this is a made up problem.
         
         elif is_valid_assignment(assignment,problem,timestamp):
             query['user_id'] = user_id
@@ -109,7 +159,7 @@ if authenticated==1:
         
         else:
             message = """
-            assignment %s, problem %s is not a valid problem or is past the due date. <br>
+            *assignment %s, problem %s rejection. not an assigned problem or is past due date. <br>
             \n
             """ % (assignment,problem)
             dataEntry = {"uploadOk":0,"submission_number":submission_number}
