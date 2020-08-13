@@ -102,7 +102,6 @@ if authenticated==1:
             dataEntry = {"uploadOk":0,"submission_number":submission_number}
         
         elif is_valid_assignment(assignment,problem,timestamp):
-        #if is_valid_assignment(assignment,problem,timestamp):
             query['user_id'] = user_id
             query['assignment'] = assignment
             query['problem'] = problem
@@ -130,7 +129,7 @@ if authenticated==1:
     
     review_message = """
     <br>
-    SUBMISSIONS:
+    REVIEWS:
     <br>
     """
     output_message = output_message + review_message

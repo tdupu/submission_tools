@@ -154,7 +154,7 @@ def is_valid_assignment(assignment, problem, timestamp, check_due_date=False):
     if n==0:
         return False
     if n>0:
-        raise ValueError("Something is terribly wrong with Professor Dupuy's assignment data. <br> Please contact him and tell him about this message. <br>")
+        raise ValueError("Assignment data is inconsistent. Please contact Professor Dupuy with this error message. <br>")
 
 def submit_problem(user_id,assignment,problem,timestamp, check_due_date=False):
     """
@@ -166,21 +166,40 @@ def submit_problem(user_id,assignment,problem,timestamp, check_due_date=False):
     S = SheetObject(path_to_data + roster_name,'submissions')
     query = {'netid':user_id, 'assignment':assignment,'problem':problem}
     if is_valid_assignment(assignment,problem,timestamp):
-        
-
         old_entries = S.get(query)
         n = len(old_entries)
         write_file = 1
         
         if n==0:
+            new_submission_number = get_submission_count()
             new_entry = {}
             new_entry['netid'] = user_id
             new_entry['assignment'] = assignment
             new_entry['problem'] = problem
-            new_entry['submission_number'] = get_submission_count()
+            new_entry['submission_number'] = new_submission_number
             new_entry['submission_time'] = timestamp
             new_entry['new_submission']=1
             new_entry['submission_locked']=0
+            new_entry['closed']=0
+            new_entry['total_score1']=0
+            new_entry['total_score2']=0
+            new_entry['reviewer1_assignment_time']=-1
+            new_entry['reviewer1']=''
+            new_entry['reviewer1_score']=-1
+            new_entry['review1']=''
+            new_entry['review1_timestamp']=-1
+            new_entry['review1_locked']=0
+            new_entry['reviewer2_assignment_time']=-1
+            new_entry['reviewer2']=''
+            new_entry['reviewer2_score']=-1
+            new_entry['review2']=''
+            new_entry['review2_timestamp']=-1
+            new_entry['review2_locked']=0
+            new_entry['new_submission']=1
+            new_entry['new_match']=0
+            new_entry['new_review1']=0
+            new_entry['new_review2']=0
+            new_entry['new_completion']=0
             S.append(new_entry)
             S.save()
             message = """
@@ -201,13 +220,13 @@ def submit_problem(user_id,assignment,problem,timestamp, check_due_date=False):
                 new_entry[key] = old_entry[key]
             
             new_submission_number = get_submission_count()
-            new_entry['netid'] = user_id
-            new_entry['assignment'] = assignment
-            new_entry['problem'] = problem
+            #new_entry['netid'] = user_id
+            #new_entry['assignment'] = assignment
+            #new_entry['problem'] = problem
             new_entry['submission_number'] = new_submission_number
             new_entry['submission_time'] = timestamp
-            new_entry['new_submission']=1
-            new_entry['submission_locked']=0
+            #new_entry['new_submission']=1
+            #new_entry['submission_locked']=0
             
             is_locked = old_entry['submission_locked'] #bug: entries -> entry
             
@@ -226,7 +245,7 @@ def submit_problem(user_id,assignment,problem,timestamp, check_due_date=False):
                 write_file = 1
                 
         else:
-            message = "The database is corrupted! Multiple submissions for this problem exist in the database! Please alert sys admin that the database is recording multiple entries! <br> "
+            message = "The database is broken! Multiple submissions for this problem exist in the database! Please send this error message to the person running this course. <br> "
             write_file =0
             
         if write_file ==1:
@@ -240,7 +259,10 @@ def submit_problem(user_id,assignment,problem,timestamp, check_due_date=False):
         
     dataentry = {}
     dataentry["uploadOk"] = write_file
-    dataentry["submission_number"]=new_submission_number
+    if write_file ==1:
+        dataentry["submission_number"]=new_submission_number
+    else:
+        dataentry["submission_number"]=-1
     return message,dataentry
 
 def is_valid_review(user_id,submission_number,score,review,timestamp):

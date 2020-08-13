@@ -1,4 +1,36 @@
+AUTHOR: TAYLOR DUPUY
+DATE: September 2020
+DESCRIPTION: Library of functions for pandemic learning. 
 
+Copyright: this library is covered under the GNU Public Licsense. 
+
+*****************
+OUTLINE OF CODE
+*****************
+
+
+
+*****************
+TODO
+*****************
+
+*Remove roster-test.xlsx from this folder.
+
+
+*****************
+COMMON BUGS
+*****************
+
+*Make sure the file paths are ok. When you call python from PHP the file path changes which tends to create a lot of import problems.
+
+*The data types reading in and out of json files/excel files can be different. Friends: the bash commands 'pwd', 'which', the #! header on the python files. 
+
+*PHP and python need the appropriate permission. 
+
+
+*****************
+REFERENCES
+*****************
 The graph theory library used for the sorting problem is documented here:
     https://pypi.org/project/graph-theory/
 
