@@ -6,25 +6,163 @@ Some of the strings in this file have issues is we don't run python3.
 
 import json
 import sys
-#sys.path.append('../excel_tools')
-#to get these paths I used the pwd unix command.
+import os
+import inspect
 
+sys.path.append('../excel_tools')
 sys.path.append('/Users/taylordupuy/Documents/web-development/dev/excel_tools')
-
 my_system_path ='/Users/taylordupuy/Documents/web-development/dev/submission_tools/'
 path_to_variables_j = my_system_path + 'variables.json'
 path_to_constants_j = my_system_path + 'constants.json'
 path_to_testing_j = my_system_path + 'testing.json'
 
 from table_editor import SheetObject
+from table_functions import *
 
+
+"""
+#########################
+FLAG FUNCTIONS
+#########################
+All flags in this project are 0 or 1 rather than true are false.
+Unset positive natural numbers are -1. 
+
+The new_review tags are only for the reviewer emails as a receipt.
+The new_completion tag is notify submitters and reviewers that the script is locked.
+    new_review1
+    new_review2
+    
+The new_match tags are both for the reviwers and the submitter.
+    
+For total_score1:
+    review1_score = -1
+    review2_score = -1
+    
+For total_score2:
+    new_completion (should be if both reviewers have submitted)
+    
+
+"""
+
+def get_current_directory():
+    filename = inspect.getframeinfo(inspect.currentframe()).filename
+    path = os.path.dirname(os.path.abspath(filename))
+    return path
+    
+def set_key(sub,key,entry)
+    """
+    WARNING: this currently doesn't check that the entry is valid.
+    """
+    CONSTANT_DATA = get_CONSTANT_DATA()
+    path_to_data = CONSTANT_DATA['path_to_data']
+    roster_name = CONSTANT_DATA['roster_name']
+    S = SheetObject(path_to_data + roster_name,'submissions')
+    S.set(sub,key,entry)
+    message = S.save()
+    return message
+    
+def mark_closed(sub):
+    message = set_key(sub,'closed',1)
+    return message
+    
+def unmark_closed(sub):
+    message = set_key(sub,'closed',0)
+    return message
+    
+def mark_new_completion(sub):
+    message = set_key(sub,'new_completion',1)
+    return message
+    
+def unmark_new_completion(sub):
+    message = set_key(sub,'new_completion',0)
+    return message
+    
+def mark_new_match(sub):
+    message = set_key(sub, 'new_match',1)
+    return message
+    
+def unmark_new_match(sub):
+    message = set_key(sub,'new_match':0)
+    return message
+    
+def mark_locked(sub):
+    message = set_key(sub,'submission_locked',1)
+    return message
+    
+def get_reviewer_index(user,sub):
+    j=0
+    if user == sub['reviewer1']:
+        j=1
+    else if user == sub['reviewer2']:
+        j=2
+    return j
+    
+def unmark_new_review(sub,j):
+    mykey = "new_review%s" % j
+    message = set_key(sub,mykey,0)
+    return message
+    
+def mark_new_review(sub,j):
+    mykey = "new_review%s" % j
+    message = set_key(sub,mykey,1)
+    return message
+
+def mark_review_locked(sub,j):
+    mykey = "review%s_locked" % j
+    message = set_key(sub,mykey,1)
+    return message
+
+def unmark_review_locked(sub,j):
+    mykey = "review%s_locked" % j
+    message = set_key(sub,mykey,0)
+    return message
+    
+def score1(sub):
+    s1 = sub['reviewer1_score']
+    s2 = sub['reviewer2_score']
+    if s1>-1 and s2>-1:
+        s = (s1+s1)/2
+        message = set_key(sub,'total_score1',s)
+    else:
+        raise ValueError("reviews are not complete")
+    return message
+    
+def score2(sub):
+    CONSTANT_DATA = get_CONSTANT_DATA()
+    path_to_data = CONSTANT_DATA['path_to_data']
+    roster_name = CONSTANT_DATA['roster_name']
+    S = SheetObject(path_to_data+roster_name,'submissions')
+    assignment = sub['assignment']
+    problem = sub['problem']
+    reviewer1 = sub['reviewer1']
+    reviewer2 = sub['reviewer2']
+    s1 = sub['reviewer1_score']
+    s2 = sub['reviewer2_score']
+    sub1 = S.get({'netid':reviewer1,'assignment':assignment,'problem':problem})
+    sub2 = S.get({'netid':reviewer1,'assignment':assignment,'problem':problem})
+    r1 = sub1['total_score1']/10
+    r2 = sub2['total_score2']/10
+    if r1==0 and r2 ==0:
+        total_score2 = sub['total_score1']
+        message = "r1=r2=0, to total_score1 = total_score2"
+    else:
+        w1 = r1/(r1+r2)
+        w2 = r2/(r1+r2)
+        total_score2 = w1*s1 + w2*s2
+        message = "the weighed average %s was recorded." % total_score2
+        set(sub,'total_score2',total_score2)
+    return message
+    
+    
+"""
+JSON FILE MANIPULATION: testing mode, server_switching.
+"""
 
 def tmode(j):
     """
-    set_test_mode
-    set_testing_mode
+    Note: this function is named so weirdly because set_test_mode and set_testing_mode seem to be taken by python.
     
-    Seem to be taken or something...
+    This turns testing mode on and off.
     """
     f=open(path_to_variables_j,'r')
     variables=json.load(f)
@@ -37,6 +175,26 @@ def tmode(j):
     if j==1:
         message = "testing mode on."
     return message
+    
+def webmode(j):
+    """
+    set_test_mode
+    set_testing_mode
+    
+    Seem to be taken or something...
+    """
+    f=open(path_to_variables_j,'r')
+    variables=json.load(f)
+    f.close()
+    variables['server_down'] = j
+    with open(path_to_variables_j, 'w') as outfile:
+        json.dump(variables,outfile)
+    if j==0:
+        message = "webpage off."
+    if j==1:
+        message = "webpage on."
+    return message
+    
 
 def increment_submission_number():
     f=open(path_to_variables_j,'r')
@@ -74,6 +232,13 @@ def get_CONSTANT_DATA():
 def get_path_to_data():
     CONSTANT_DATA = get_CONSTANT_DATA()
     return CONSTANT_DATA['path_to_data']
+    
+    
+"""
+#########################
+MAIN FUNCTIONS
+#########################
+"""
 
 def authenticate(user_id, pass1, pass2, newpass):
     CONSTANT_DATA = get_CONSTANT_DATA()
@@ -341,21 +506,25 @@ def write_review(user_id,submission_number,score,review,timestamp):
         
         old_entry = S.get({'submission_number':submission_number})[0]
         
-        #NEVER DO THIS WITH DICTIONARIES
-        #new_entry = old_entry
+        #NEVER DO THIS WITH DICTIONARIES: new_entry = old_entry
+        #it have new_entry point to old_entry in memory
+        #note: copyd function in ../excel_tools/table_functions.py
         new_entry = {}
         for key in S.keys:
             new_entry[key] = old_entry[key]
         
-        
-        #With the old command...
-        #commands below just modify old_entry in memory.
         new_entry['review%s' % j] = review
         new_entry['reviewer%s_score' % j] = int(score) #not scorej, holy shit this bug took me forever.
         new_entry['review%s_timestamp' % j] = timestamp
         new_entry['new_review%s' % j] = 1
         
-        #debuggin
+        #check to see if this new review makes the entry complete.
+        k = (j%2) +1 #other index
+        if old_entry['reviewer%s_score' % k]>-1:
+            new_entry['new_completion']=1
+        
+        
+        #DEBUG
         #A=set(list(new_entry.keys()))
         #B=set(list(old_entry.keys()))
         #print(B.issubset(A))
@@ -370,9 +539,3 @@ def write_review(user_id,submission_number,score,review,timestamp):
         S.save()
             
     return message
-    
-
-
-#def write_review(user_id,submission_number,score,review,timestamp):
-#    S = SheetObject(path_to_data + "roster.xlsx", "submissions")
-

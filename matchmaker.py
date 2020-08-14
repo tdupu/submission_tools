@@ -1,11 +1,11 @@
 import json
 import sys
-
 import time
-from matchmaker_functions import *
 
 #sys.path.append('../excel_tools')
 #to get these paths I used the pwd unix command.
+
+
 
 sys.path.append('/Users/taylordupuy/Documents/web-development/dev/excel_tools')
 my_system_path ='/Users/taylordupuy/Documents/web-development/dev/submission_tools/'
@@ -14,10 +14,9 @@ path_to_constants_j = my_system_path + 'constants.json'
 path_to_testing_j = my_system_path + 'testing.json'
 
 from table_editor import SheetObject
-
-"""
-TODO: import the function that shuts down the server when using this code.
-"""
+from table_functions import *
+from matchmaker_functions import *
+from submission_functions import *
 
 
 """
@@ -26,7 +25,6 @@ GLOBAL VARIABLES
 
 #confirm that we are testing
 tmode(1)
-
 
 #these need to be imported from CONSTANTS.json
 path_to_data = ""

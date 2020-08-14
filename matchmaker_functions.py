@@ -1,11 +1,9 @@
 import numpy as np
 from graph import *
-
 import json
 import sys
-
 import time
-from matchmaker_functions import *
+
 
 #sys.path.append('../excel_tools')
 #to get these paths I used the pwd unix command.
@@ -17,65 +15,9 @@ path_to_constants_j = my_system_path + 'constants.json'
 path_to_testing_j = my_system_path + 'testing.json'
 
 from table_editor import SheetObject
+from table_functions import *
+from matchmaker_functions import *
 
-"""
-arguably these first two should go in mod_functions.py in excel_tools
-"""
-
-def copyd(oldd):
-    newd = {}
-    for k in oldd.keys():
-        newd[k] = oldd[k]
-    return newd
-
-def dicts_by_key(keys,X):
-    dictX = {}
-    vals = []
-    for x in X:
-        p = [x[k] for k in keys]
-        
-        if vals.count(p)==0:
-            vals.append(p)
-        
-        if dictX[p]==None:
-            dictX[p] = []
-            dictX[p].append(x)
-        else:
-            dictX[p].append(x)V
-    return vals,dictX
-
-"""
-This function isn't used here but I want to use it in Zulip for
-1) pairing people into random streams during class
-2) "speeddating" when we need to talk about problems
-3) tournament of ideas.
-
-I'm going pair people at random and then throw them in a chat room for 10 minutes and then cancel.
-"""
-
-def chunk(mylist,n):
-    """
-    len(chunk(range(21),6)) == 21//6
-    True
-    """
-    m = len(mylist)
-    r = m % n
-    a=m//n
-    if a==0:
-        return [mylist]
-    if r==0 and a>0:
-        mylist = list(np.random.permutation(mylist))
-        return [mylist[n*i:n*(i+1)] for i in range(a)]
-    else:
-        remainders = mylist[0:r]
-        remainders = np.random.permutation(remainders)
-        newlist = mylist
-        teams = chunk(mylist[r:],n)
-        m = len(teams)
-        for i in range(r):
-            j = i % m
-            teams[j].append(remainders[i])
-            return teams
 
 def is_admissible(V,degree_dict):
     """
