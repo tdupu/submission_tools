@@ -49,7 +49,7 @@ def get_current_directory():
     path = os.path.dirname(os.path.abspath(filename))
     return path
     
-def set_key(sub,key,entry)
+def set_key(sub,key,entry):
     """
     WARNING: this currently doesn't check that the entry is valid.
     """
@@ -82,7 +82,7 @@ def mark_new_match(sub):
     return message
     
 def unmark_new_match(sub):
-    message = set_key(sub,'new_match':0)
+    message = set_key(sub,'new_match',0)
     return message
     
 def mark_locked(sub):
@@ -93,7 +93,7 @@ def get_reviewer_index(user,sub):
     j=0
     if user == sub['reviewer1']:
         j=1
-    else if user == sub['reviewer2']:
+    elif user == sub['reviewer2']:
         j=2
     return j
     

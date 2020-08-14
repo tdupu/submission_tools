@@ -5,9 +5,8 @@ import time
 #sys.path.append('../excel_tools')
 #to get these paths I used the pwd unix command.
 
-
-
 sys.path.append('/Users/taylordupuy/Documents/web-development/dev/excel_tools')
+path_to_data = '/Users/taylordupuy/Documents/web-development/data/algebra-one/20/f/'
 my_system_path ='/Users/taylordupuy/Documents/web-development/dev/submission_tools/'
 path_to_variables_j = my_system_path + 'variables.json'
 path_to_constants_j = my_system_path + 'constants.json'
@@ -23,15 +22,18 @@ from submission_functions import *
 GLOBAL VARIABLES
 """
 
-#confirm that we are testing
-tmode(1)
+#testing?
+is_test = sys.argv[1]
+if is_test ==1:
+    tmode(1)
+else:
+    tmode(0)
 
 #these need to be imported from CONSTANTS.json
-path_to_data = ""
 roster_name = "roster-test.xlsx"
 CURRENT_TIME = int(time.time())
 
-S = SheetObject(path_to_data + roster_name,"submissions.xlsx")
+S = SheetObject(path_to_data + roster_name,"submissions")
 X = S.get({"new_submission":1})
 
 probs, dictX = dicts_by_key(['assignment','problem'],X)
@@ -83,3 +85,4 @@ for prob in probs:
     for v in dictX[prob]:
         S.replace(v,dictY[prob][v])
         S.save()
+

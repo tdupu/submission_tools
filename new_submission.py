@@ -1,16 +1,3 @@
-#!/usr/bin/env python3
-
-#import json
-#import sys
-
-
-#the following gives an error but it looks like we don't need it.
-#sys.path.append('..')
-#from excel_tools.table_editor import SheetObject
-#from submission_functions import *
-
-#JSON requires double quotes!
-
 """
 Different things happen depending on if you run python3 or python on this file.
 """
