@@ -57,45 +57,51 @@ for prob in probs:
         degree_dict[v]['out']=outdeg
     
     #BUILD THE DIRECTED RANDOM GRAPH
+    worked = True
     try:
-        g=match_up(g,V,degree_dict)
+        g=get_random_graph(g,V,degree_dict,10)
         #make a dictionary of replacement entries
         #replacement = {}
         print("FOUND A MATCH:" + str(prob) + "\n")
-        for e in g.edges():
-            print(e)
-            
-        for v in V:
-            vv=match_key(dictX[prob],'netid',v)[0]
-            w = copyd(vv)
-            reviewersv = [edge[0] for edge in g.edges(to_node=v)]
-            #print(reviewersv)
-            w["reviewer1"] = reviewersv[0]
-            w["reviewer2"] = reviewersv[1]
-            w["reviewer1_assignment_time"] = int(time.time()) #PHP style: =now-197? in sec
-            w["reviewer2_assignment_time"] = int(time.time())
-            w["new_submission"]=0
-            w["submission_locked"]=1
-            w["new_match"]=1
-            S.replace(vv,w)
-            S.save()
-            print(" * %s will be reviewed by %s and %s \n" % (v,reviewersv[0],reviewersv[1]))
-            #print("matches made and saved for (assignment,problem):"  + str(prob[0]) +" " + str(prob[1]) + "\n" )
-       
-    
+        
     except ValueError as e:
         print("could not match (problem, assignment):" + str(prob))
         print(e)
         print('\n')
         no_matches.append(prob)
+        worked = False
+        
+    if worked == True:
+        for e in g.edges():
+            print(e)
+        
+        for v in V:
+            print(v)
+            print(g.edges(to_node=v))
+            
+        for v in V:
+            #vv=match_key(dictX[prob],'netid',v)[0]
+            vv = S.get({'assignment':prob[0],'problem':prob[1],'netid':v})[0]
+            w = copyd(vv)
+            reviewersv = [edge[0] for edge in g.edges(to_node=v)]
+            w["reviewer1"] = reviewersv[0]
+            w["reviewer2"] = reviewersv[1]
+            print(" * %s will be reviewed by %s and %s \n" % (v,reviewersv[0],reviewersv[1]))
+            w["reviewer1_assignment_time"] = int(time.time()) #PHP style: =now-197? in sec
+            w["reviewer2_assignment_time"] = int(time.time())
+            w["new_submission"]=0
+            w["submission_locked"]=1
+            w["new_match"]=1
+            print(vv)
+            print(w)
+            S.replace(vv,w)
+            S.save()
+
     
     """
     we could store the graphs somewhere if we wanted...
     """
     
-    
-
-        
 print("\n Here are the (assignment,problems) we couldn't match:")
 print(no_matches)
         
@@ -108,3 +114,5 @@ print(no_matches)
 #        S.replace(v,dictY[prob][v])
 #        S.save()
 #"""
+
+

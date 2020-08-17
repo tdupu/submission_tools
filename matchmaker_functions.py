@@ -61,7 +61,7 @@ def match_up(g,V,degree_dict):
         return g
     
     if not is_admissible(V,degree_dict):
-        raise ValueError('matching error, degree dict not admissible \n %s' % degree_dict)
+        raise ValueError('matching error, degree dict not admissible')
         
     else:
         #V = sorted(V, key=(lambda v : degree_dict[v]['out']), reverse=True)
@@ -85,7 +85,7 @@ def match_up(g,V,degree_dict):
                 degree_dict[v]['out'] = degree_dict[v]['out']-1
             i=i+1
             if i>=n:
-                raise ValueError("can't made edges for v=%s " % v)
+                raise AttributeError("can't made edges for v=%s " % v)
         
         W = sorted(W, key=(lambda w : degree_dict[w]['out']), reverse=True)
         #print(W)
@@ -99,9 +99,19 @@ def match_up(g,V,degree_dict):
                 degree_dict[v]['in'] = degree_dict[v]['in']-1
             i=i+1
             if i>=n:
-                raise ValueError("can't made edges for v=%s " % v)
+                raise AttributeError("can't made edges for v=%s " % v)
                 
     return match_up(g,W,degree_dict)
 
 
-
+def get_random_graph(g,V,degree_dict,n):
+    if n==0:
+        raise AttributeError("exceeded number of tries")
+    else:
+        try:
+            g=match_up(g,V,degree_dict)
+        except AttributeError as e:
+            g=get_random_graph(g,V,degree_dict,n-1)
+            
+    return g
+            
