@@ -37,16 +37,15 @@ S = SheetObject(path_to_data + roster_name,"submissions")
 X = S.get({"new_submission":1})
 
 probs, dictX = dicts_by_key(['assignment','problem'],X)
-dictY = {} #we will store dictY[ [assignment,problem] ] dictionary of replacements
+#dictY = {} #we will store dictY[ [assignment,problem] ] dictionary of replacements
+no_matches = []
 
 for prob in probs:
-    
     #INITIALIZE STUFF I NEED TO BUILD THE GRAPH
-    V = dictX[prob]
+    V = [v['netid'] for v in dictX[prob]]
     g = Graph()
     for v in V:
         g.add_node(v)
-        
         
     indeg=2
     outdeg=2
@@ -58,31 +57,54 @@ for prob in probs:
         degree_dict[v]['out']=outdeg
     
     #BUILD THE DIRECTED RANDOM GRAPH
-    g=match_up(g,V,degree_dict)
+    try:
+        g=match_up(g,V,degree_dict)
+        #make a dictionary of replacement entries
+        #replacement = {}
+        print("FOUND A MATCH:" + str(prob) + "\n")
+        for e in g.edges():
+            print(e)
+            
+        for v in V:
+            vv=match_key(dictX[prob],'netid',v)[0]
+            w = copyd(vv)
+            reviewersv = [edge[0] for edge in g.edges(to_node=v)]
+            #print(reviewersv)
+            w["reviewer1"] = reviewersv[0]
+            w["reviewer2"] = reviewersv[1]
+            w["reviewer1_assignment_time"] = int(time.time()) #PHP style: =now-197? in sec
+            w["reviewer2_assignment_time"] = int(time.time())
+            w["new_submission"]=0
+            w["submission_locked"]=1
+            w["new_match"]=1
+            S.replace(vv,w)
+            S.save()
+            print(" * %s will be reviewed by %s and %s \n" % (v,reviewersv[0],reviewersv[1]))
+            #print("matches made and saved for (assignment,problem):"  + str(prob[0]) +" " + str(prob[1]) + "\n" )
+       
+    
+    except ValueError as e:
+        print("could not match (problem, assignment):" + str(prob))
+        print(e)
+        print('\n')
+        no_matches.append(prob)
     
     """
     we could store the graphs somewhere if we wanted...
     """
     
     
-    #make a dictionary of replacement entries
-    replacement = {}
-    for v in V:
-        w = copyd(v)
-        reviewersv = [edge[0]['netid'] for edge in g.edges(to_node=v)]
-        w["reviewer1"] = reviewersv[0]
-        w["reviewer2"] = reviewersv[1]
-        w["reviewer1_assignment_time"] = int(time.time()) #PHP style: =now-197? in sec
-        w["reviewer2_assignment_time"] = int(time.time())
-        w["new_submission"]=0
-        w["submission_locked"]=1
-        w["new_match"]=1
-        replacement[v]=w
-        
-    dictY[prob]=replacement
-    
-for prob in probs:
-    for v in dictX[prob]:
-        S.replace(v,dictY[prob][v])
-        S.save()
 
+        
+print("\n Here are the (assignment,problems) we couldn't match:")
+print(no_matches)
+        
+        
+#    dictY[prob]=replacement
+
+#"""
+#for prob in probs:
+#    for v in dictX[prob]:
+#        S.replace(v,dictY[prob][v])
+#        S.save()
+#"""
