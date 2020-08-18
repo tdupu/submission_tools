@@ -57,12 +57,14 @@ for prob in probs:
         degree_dict[v]['out']=outdeg
     
     #BUILD THE DIRECTED RANDOM GRAPH
-    worked = True
+    worked = None
     try:
-        g=get_random_graph(g,V,degree_dict,10)
+        g = get_random_graph(g,V,degree_dict,100)
+        #g=random_graph_spliced(g,V,degree_dict)
         #make a dictionary of replacement entries
         #replacement = {}
         print("FOUND A MATCH:" + str(prob) + "\n")
+        worked = True
         
     except ValueError as e:
         print("could not match (problem, assignment):" + str(prob))
@@ -72,12 +74,12 @@ for prob in probs:
         worked = False
         
     if worked == True:
-        for e in g.edges():
-            print(e)
+        #for e in g.edges():
+        #    print(e)
         
-        for v in V:
-            print(v)
-            print(g.edges(to_node=v))
+        #for v in V:
+        #    print(v)
+        #    print(g.edges(to_node=v))
             
         for v in V:
             #vv=match_key(dictX[prob],'netid',v)[0]
@@ -92,8 +94,8 @@ for prob in probs:
             w["new_submission"]=0
             w["submission_locked"]=1
             w["new_match"]=1
-            print(vv)
-            print(w)
+            #print(vv)
+            #print(w)
             S.replace(vv,w)
             S.save()
 

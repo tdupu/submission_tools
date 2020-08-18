@@ -106,7 +106,7 @@ def match_up(g,V,degree_dict):
 
 def get_random_graph(g,V,degree_dict,n):
     if n==0:
-        raise AttributeError("exceeded number of tries")
+        raise ValueError("exceeded number of tries")
     else:
         try:
             g=match_up(g,V,degree_dict)
@@ -114,4 +114,56 @@ def get_random_graph(g,V,degree_dict,n):
             g=get_random_graph(g,V,degree_dict,n-1)
             
     return g
+    
+    
+def splice(g,v,d,forbiddena=[],forbiddenb=[]):
+    """
+    Take two (a,b), (c,d) with a neq c and b neq d
+    Remove the edges and add (a,v),(v,b),(c,v),(v,d)
+    """
+    edges=[e for e in np.random.permutation(g.edges())]
+    e=edges[0]
+    myedges=[]
+    myedges.append(e)
+    forbiddena.append(e[0])
+    forbiddenb.append(e[1])
+    n=d
+    for f in edges[1:]:
+        if forbiddena.count(f)==0 and forbiddenb.count(f[1])==0:
+            myedges.append(f)
+            forbiddena.append(f[0])
+            forbiddenb.append(f[1])
+            found_next=True
+            n = n-1
             
+        if n==0:
+            break
+            
+    for e in myedges:
+        g.del_edge(e)
+        g.add_edge(e[0],v)
+        g.add_edge(v,e[1])
+        
+    return g
+        
+def random_graph_spliced(g,V,degree_dict):
+    """
+    Start with three then splice in vertices as you go.
+    """
+    if len(V)==3:
+        g.add_edge(V[0],V[1])
+        g.add_edge(V[0],V[2])
+        g.add_edge(V[1],V[0])
+        g.add_edge(V[1],V[2])
+        g.add_edge(V[2],V[0])
+        g.add_edge(V[2],V[1])
+        return g
+        
+    elif len(V)<3:
+        raise ValueError
+        
+    else:
+        W = V[1:]
+        return splice(random_graph_spliced(g,W,degree_dict),V[0],degree_dict[V[0]]['in'])
+    
+

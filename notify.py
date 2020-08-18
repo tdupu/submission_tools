@@ -10,6 +10,7 @@ from table_editor import SheetObject
 from table_functions import *
 from matchmaker_functions import *
 from submission_functions import * #for shutting down server, setting values.
+from notify_functions import *
 
 #sys.path.append('../excel_tools')
 #to get these paths I used the pwd unix command.
@@ -27,61 +28,9 @@ Grade Summary:
 there are transmitted periodically.
 
 The present file gives a nightly update on progress.
-
 """
 
 
-
-"""
-PRINT STATEMENTS
-"""
-
-def print_submission_header(sub):
-    if sub['new_submission'==1]:
-        message="    %s (new): assignment %s, problem %s \n" % (sub['submission_number'], sub['assignment'], sub['problem'])
-    else:
-        message="    %s: assignment %s, problem %s \n" % (sub['submission_number'], sub['assignment'], sub['problem'])
-    return message
-
-def print_review(sub,j):
-    """
-    sub is a dictionary
-    j is the reviewer index.
-    """
-    if [1,2].count(j)=0:
-        return ""
-    else:
-        message = """
-                score: %s
-                comments: %s
-                
-        """ % (sub['reviewer%s_score' %j],sub('review%s' %j))
-    return message
-        
-def print_final_score(sub):
-    message = """
-        raw score: %s
-        adjusted score: %s
-    """ % sub['total_score1','total_score2']
-            
-def print_full_problem_report(sub):
-    message = print_header(sub) + "\n"
-    message =+ "    reviewer 1 \n"
-    message += print_review(sub,1) + "\n"
-    message =+ "    reviewer 2 \n"
-    message += print_review(sub,2) + "\n"
-    return message
-    
-def print_filenames(sub,user):
-    """
-    returns the dict with 'datafile' and 'uploadfile' entries.
-    datafile = name of relevant pdf in path_to_data/uploads/
-    uploadfile = name of file that will be sent to the user in the email.
-    """
-    ending = '-' + sub['submission_number'] + '-' + sub['assignment'] + sub['problem'] + '.pdf'
-    datafile = sub['user'] + ending
-    uploadfile = 'ForReview'+ending
-    return {'datafile':datafile, 'uploadfile':uploadfile}
     
 """
 Main script.
@@ -94,16 +43,14 @@ path_to_variables_j = my_system_path + 'variables.json'
 path_to_constants_j = my_system_path + 'constants.json'
 path_to_testing_j = my_system_path + 'testing.json'
 path_to_data = get_path_to_data()
-rostername = "roster-test.xlsx"
+roster_name = "roster-test.xlsx"
 course_name = "Math 251"
 
 #turn off the server
 webmode(0)
 
-
-
 R = SheetObject(path_to_data + roster_name, "roster")
-users = R.get({})
+students = R.get({})
 users = [student["netid"] for student in students]
 
 
@@ -124,7 +71,7 @@ The email consists of four sections
 
 
 mydate = datetime.datetime.now()
-mydate_s = '-'.join([str(date.month),str(date.day),str(date.year)])
+mydate_s = '-'.join([str(mydate.month),str(mydate.day),str(mydate.year)])
 
 for user in users:
     emails[user] = {}
@@ -132,17 +79,18 @@ for user in users:
     emails[user]['message_parts'] = {}
     emails[user]['attachments'] = []
 
-    emails[user]['header'] = """
+    
+    #we may need to replace message_parts with emails['user']['message_parts'] if we get a bug
+    #I'm taking advantage of the way dictionaries point in python here.
+    message_parts = emails[user]['message_parts']
+    message_parts['header'] = """
     ################
     %s SERVER UPDATE FOR %s
     ################ \n \n
     """ % (mydate_s,user)
-    
-    #we may need to replace message_parts with emails['user']['message_parts'] if we get a bug
-    message_parts = emails['user']['message_parts']
-    message_parts['open_submissions']= "YOUR OPEN SUBMISSIONS: \n " %user
+    message_parts['open_submissions']= "YOUR OPEN SUBMISSIONS: \n "
     message_parts['new_closed_submissions'] = "NEW CLOSED SUBMISSIONS: \n"
-    message_parts['new_reviews'] = "REVIEWS YOU SUBMITTED: \n" % user
+    message_parts['new_reviews'] = "REVIEWS YOU SUBMITTED: \n" #% user
     message_parts['new_referee_requests'] = "NEW REFEREE REQUESTS (see attachments for files): \n"
     message_parts['complete_message'] = """
     
@@ -158,26 +106,28 @@ for user in users:
             
             if sub['new_completion']==0:
                #add to open submission (this should be improved)
-               message_parts['open_submissions'] += print_header(sub)
+               message_parts['open_submissions'] += print_submission_header(sub)
                num_open+=1
                
-            else if sub['new_completion']==1:
+            elif sub['new_completion']==1:
                #add to new closed submissions
                message_parts['new_closed_submissions'] += print_full_problem_report(sub)
                num_closed+=1
                 
         else:
-           j = get_reviewer_index(user):
-                if j!=0:
-                    if sub['new_match']==1:
-                        num_requests+=1
-                        message_parts['new_referee_requests'] += print_header(sub)
-                        new_requests +=1
+            j = get_reviewer_index(user,sub)
+            
+            if j!=0:
+            
+                if sub['new_match']==1:
+                    num_requests+=1
+                    message_parts['new_referee_requests'] += print_submission_header(sub)
+                    num_requests +=1
                         
-                    else if sub['new_review%s' % j]==1:
-                        message_parts['new_reviews']+= print_header(sub)
-                        message_parts['new_reviews']+= print_review(sub,j)
-                        new_revs+=1
+                elif sub['new_review%s' % j]==1:
+                    message_parts['new_reviews']+= print_header(sub)
+                    message_parts['new_reviews']+= print_review(sub,j)
+                    num_revs+=1
                         
         
     #builds the message
@@ -200,7 +150,7 @@ for user in users:
     
 #temp3.json will be read by the upload.php
 #used to determine if one should attempt to upload the PDFs
-json_filename =
+#json_filename =
 with open(path_to_data + 'emails-' + mydate_s +'.json', 'w') as outfile:
     json.dump(emails,outfile)
 
