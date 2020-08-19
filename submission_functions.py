@@ -4,17 +4,22 @@
 Some of the strings in this file have issues is we don't run python3.
 """
 
+
+
 import json
 import sys
 import os
 import inspect
 
-sys.path.append('../excel_tools')
-sys.path.append('/Users/taylordupuy/Documents/web-development/dev/excel_tools')
-my_system_path ='/Users/taylordupuy/Documents/web-development/dev/submission_tools/'
-path_to_variables_j = my_system_path + 'variables.json'
-path_to_constants_j = my_system_path + 'constants.json'
-path_to_testing_j = my_system_path + 'testing.json'
+INSTALL_PATH ='/Users/taylordupuy/Documents/web-development/dev/submission_tools/'
+sys.path.append(INSTALL_PATH + "../excel_tools")
+
+#sys.path.append('../excel_tools')
+#sys.path.append('/Users/taylordupuy/Documents/web-development/dev/excel_tools')
+
+path_to_variables_j = INSTALL_PATH + 'variables.json'
+path_to_constants_j = INSTALL_PATH + 'constants.json'
+path_to_testing_j = INSTALL_PATH + 'testing.json'
 
 from table_editor import SheetObject
 from table_functions import *
@@ -41,8 +46,27 @@ For total_score1:
 For total_score2:
     new_completion (should be if both reviewers have submitted)
     
-
 """
+
+def get_CONSTANT_DATA():
+    ff = open(path_to_variables_j,'r')
+    variables = json.load(ff)
+    ff.close()
+    test_on = variables['testing']
+
+    if test_on ==1:
+        f = open(path_to_testing_j,'r')
+        
+    if test_on==0:
+        f = open(path_to_constants_j,'r')
+        
+    CONSTANT_DATA = json.load(f)
+    f.close()
+    return CONSTANT_DATA
+    
+def get_path_to_data():
+    CONSTANT_DATA = get_CONSTANT_DATA()
+    return CONSTANT_DATA['path_to_data']
 
 def get_current_directory():
     filename = inspect.getframeinfo(inspect.currentframe()).filename
@@ -212,26 +236,6 @@ def get_submission_count():
     variables=json.loads(f.read())
     f.close()
     return variables['submission_number']
-
-def get_CONSTANT_DATA():
-    ff = open(path_to_variables_j,'r')
-    variables = json.load(ff)
-    ff.close()
-    test_on = variables['testing']
-
-    if test_on ==1:
-        f = open(path_to_testing_j,'r')
-        
-    if test_on==0:
-        f = open(path_to_constants_j,'r')
-        
-    CONSTANT_DATA = json.load(f)
-    f.close()
-    return CONSTANT_DATA
-    
-def get_path_to_data():
-    CONSTANT_DATA = get_CONSTANT_DATA()
-    return CONSTANT_DATA['path_to_data']
     
     
 """

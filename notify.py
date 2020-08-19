@@ -1,10 +1,12 @@
 import json
 import sys
+import os
 import time
 import datetime
 
-sys.path.append('/Users/taylordupuy/Documents/web-development/dev/excel_tools')
-my_system_path ='/Users/taylordupuy/Documents/web-development/dev/submission_tools/'
+
+INSTALL_PATH ='/Users/taylordupuy/Documents/web-development/dev/submission_tools/'
+sys.path.append(INSTALL_PATH + "../excel_tools/")
 
 from table_editor import SheetObject
 from table_functions import *
@@ -12,9 +14,19 @@ from matchmaker_functions import *
 from submission_functions import * #for shutting down server, setting values.
 from notify_functions import *
 
-#sys.path.append('../excel_tools')
-#to get these paths I used the pwd unix command.
+"""
+MORE INFORMATION ON HANDLING OPTIONS
+https://www.tutorialspoint.com/python/python_command_line_arguments.htm
 
+You call this scripts as follows:
+    python3 notify.py /path/to/data/ 0
+If you just run
+    python3 notify.py
+It will assume the path like my local folder and that we are testing. I intend testing to be 1 and non-testing to be 0.
+"""
+
+
+    
 """
 We decided to have three types of emails.
 
@@ -31,30 +43,48 @@ The present file gives a nightly update on progress.
 """
 
 
-    
 """
 Main script.
 """
 
 
-sys.path.append('/Users/taylordupuy/Documents/web-development/dev/excel_tools')
-my_system_path ='/Users/taylordupuy/Documents/web-development/dev/submission_tools/'
-path_to_variables_j = my_system_path + 'variables.json'
-path_to_constants_j = my_system_path + 'constants.json'
-path_to_testing_j = my_system_path + 'testing.json'
-path_to_data = get_path_to_data()
-roster_name = "roster-test.xlsx"
-course_name = "Math 251"
+#filename = "emails-%s.json" % mydate_s
+#path_to_variables_j = INSTALL_PATH + 'variables.json'
+#path_to_constants_j = INSTALL_PATH + 'constants.json'
+#path_to_testing_j = INSTALL_PATH + 'testing.json'
+
+#f = open(PATH_TO_DATA+'constants.json','r')
+#CONSTANTS=json.loads(f.read())
+#f.close()
+
+if len(sys.argv)>1:
+    PATH_TO_DATA = sys.argv[1]
+else:
+    PATH_TO_DATA = '/Users/taylordupuy/Documents/web-development/data/algebra-one/20/f/'
+
+with open(PATH_TO_DATA+'constants.json','r') as f:
+    CONSTANTS=json.loads(f.read())
+    
+if len(sys.argv)>2:
+    if argv[2]==0:
+        roster_name = CONSTANTS['roster_name.xlsx']
+        course_name = CONSTANTS['course_name']
+    else:
+        roster_name = "roster-test.xlsx"
+        course_name = "Math 251"
+else:
+    roster_name = "roster-test.xlsx"
+    course_name = "Math 251"
 
 #turn off the server
 webmode(0)
 
-R = SheetObject(path_to_data + roster_name, "roster")
+R = SheetObject(PATH_TO_DATA + roster_name, "roster")
 students = R.get({})
 users = [student["netid"] for student in students]
 
 
-S = SheetObject(path_to_data + roster_name, "submissions")
+S = SheetObject(PATH_TO_DATA + roster_name, "submissions")
 updated_subs = kill_repeats(S.get({"new_submission":1})+S.get({"new_match":1})+S.get({"new_review1":1})+S.get({"new_review2":1}))
 
 emails = {}
@@ -75,23 +105,46 @@ mydate_s = '-'.join([str(mydate.month),str(mydate.day),str(mydate.year)])
 
 for user in users:
     emails[user] = {}
-    emails[user]['subject'] = course_name + " Database Updates" + ("%s" % datetime.datetime.now())
-    emails[user]['message_parts'] = {}
+    emails[user]['subject'] = course_name + " Database Updates " + ("%s" % datetime.datetime.now())
+    #emails[user]['message_parts'] = {}
+    emails[user]['message'] =''
     emails[user]['attachments'] = []
+    emails[user]['receiver'] = R.get({'netid':user})[0]['email']
 
     
     #we may need to replace message_parts with emails['user']['message_parts'] if we get a bug
     #I'm taking advantage of the way dictionaries point in python here.
-    message_parts = emails[user]['message_parts']
+    #message_parts = emails[user]['message_parts']
+    message_parts = {}
     message_parts['header'] = """
-    ################
-    %s SERVER UPDATE FOR %s
-    ################ \n \n
-    """ % (mydate_s,user)
-    message_parts['open_submissions']= "YOUR OPEN SUBMISSIONS: \n "
-    message_parts['new_closed_submissions'] = "NEW CLOSED SUBMISSIONS: \n"
-    message_parts['new_reviews'] = "REVIEWS YOU SUBMITTED: \n" #% user
-    message_parts['new_referee_requests'] = "NEW REFEREE REQUESTS (see attachments for files): \n"
+    Dear %s,
+    
+    Below you will find updates on the server pertaining to the coursework in the class.
+    These include
+       A) receipts for new open submissions,
+       B) newly closed submissions (grades),
+       C) receipts for reviews you have submitted,
+       D) new referee requests.
+    Reviews are due approximately one week from this email.
+    
+    If any of the items (A)-(D) don't appear, that is because there are no updates on the server.
+    
+    TIPS ON REVIEWS:
+    Don't make too much work for yourself (it is a pandemic after all). They should be super quick after you get used to doing them. Reviews can be a sentence or two. If you are feeling generous you can explain to the submitter what they missed. The most important part is that your comments have pinpoint accuracy. This includes finding missing implications and logical gaps (e.g. "the writer forgot to prove the converse" or "the base case of the induction proof is missing"), pointing to errors by their line numbers/sentence/part ("the equality displayed below the second sentence is incorrect" -- give counter-examples when you can!), pointing to specific errors like missing definitions undefined symbols etc. ("The symbol 'A' in the first sentence of the second paragraph is not defined."). When a submission is good, make your life easy. Writing a single word like "perfect" suffices.
+    
+    Best,
+    Taylor's Automated Emailer
+    
+    
+    
+    ##############################
+    %s SERVER UPDATES FOR %s
+    ############################## \n
+    """ % (user, mydate_s,user)
+    message_parts['open_submissions']= " \n YOUR OPEN SUBMISSIONS: \n  "
+    message_parts['new_closed_submissions'] = "\n NEW CLOSED SUBMISSIONS: \n "
+    message_parts['new_reviews'] = "\n REVIEWS YOU SUBMITTED: \n " #% user
+    message_parts['new_referee_requests'] = "\n NEW REFEREE REQUESTS (see attachments for files): \n"
     message_parts['complete_message'] = """
     
     
@@ -113,7 +166,7 @@ for user in users:
                #add to new closed submissions
                message_parts['new_closed_submissions'] += print_full_problem_report(sub)
                num_closed+=1
-                
+               
         else:
             j = get_reviewer_index(user,sub)
             
@@ -123,11 +176,14 @@ for user in users:
                     num_requests+=1
                     message_parts['new_referee_requests'] += print_submission_header(sub)
                     num_requests +=1
+                    owner = sub['netid']
+                    emails[user]['attachments'].append(print_filenames(sub,owner,PATH_TO_DATA + "uploads/"))
                         
                 elif sub['new_review%s' % j]==1:
                     message_parts['new_reviews']+= print_header(sub)
                     message_parts['new_reviews']+= print_review(sub,j)
                     num_revs+=1
+
                         
         
     #builds the message
@@ -146,12 +202,11 @@ for user in users:
     if num_requests>0:
         message+=message_parts['new_referee_requests']
         
-    message_parts['complete_message']=message
+    #message_parts['complete_message']=message
+    emails[user]['message'] = message
     
-#temp3.json will be read by the upload.php
-#used to determine if one should attempt to upload the PDFs
-#json_filename =
-with open(path_to_data + 'emails-' + mydate_s +'.json', 'w') as outfile:
+#WE MAYBE NEED TO DO MAKE AND APPEND METHOD:
+with open(PATH_TO_DATA + 'emails-' + mydate_s +'.json', 'w') as outfile:
     json.dump(emails,outfile)
 
 #turn webpage back on

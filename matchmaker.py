@@ -5,35 +5,65 @@ import time
 #sys.path.append('../excel_tools')
 #to get these paths I used the pwd unix command.
 
-sys.path.append('/Users/taylordupuy/Documents/web-development/dev/excel_tools')
-path_to_data = '/Users/taylordupuy/Documents/web-development/data/algebra-one/20/f/'
-my_system_path ='/Users/taylordupuy/Documents/web-development/dev/submission_tools/'
-path_to_variables_j = my_system_path + 'variables.json'
-path_to_constants_j = my_system_path + 'constants.json'
-path_to_testing_j = my_system_path + 'testing.json'
+PATH_TO_DATA = '/Users/taylordupuy/Documents/web-development/data/algebra-one/20/f/'
+INSTALL_PATH ='/Users/taylordupuy/Documents/web-development/dev/submission_tools/'
+sys.path.append(INSTALL_PATH+"../excel_tools")
+#sys.path.append('/Users/taylordupuy/Documents/web-development/dev/excel_tools')
 
 from table_editor import SheetObject
 from table_functions import *
 from matchmaker_functions import *
 from submission_functions import *
+        
+path_to_variables_j = INSTALL_PATH + 'variables.json'
+path_to_constants_j = INSTALL_PATH + 'constants.json'
+path_to_testing_j = INSTALL_PATH + 'testing.json'
+
+CURRENT_TIME = int(time.time())
+
+"""
+PARSE INPUTS:
+test with path --- "matchmaker.py /path/to/data/ 1
+test --- matchmaker.py
+
+
+"""
+
+
+if len(sys.argv)==2:
+    is_test = sys.argv[1]
+    if is_test ==1:
+        tmode(1)
+        roster_name = "roster-test.xlsx"
+    else:
+        tmode(0)
+elif len(sys.argv)==3:
+    PATH_TO_DATA = sys.argv[1]
+    with open(PATH_TO_DATA+'variables.json','r') as f:
+        CONSTANTS = json.loads(constants.json)
+    roster_name = CONSTANTS['roster_name']
+    is_test = sys.argv[2]
+    if is_test ==1:
+        tmode(1)
+        roster_name = "roster-test.xlsx"
+    else:
+        tmode(0)
+else:
+    roster_name = "roster-test.xlsx"
+    tmode(1)
 
 
 """
 GLOBAL VARIABLES
 """
 
+
+    
+
 #testing?
-is_test = sys.argv[1]
-if is_test ==1:
-    tmode(1)
-else:
-    tmode(0)
 
-#these need to be imported from CONSTANTS.json
-roster_name = "roster-test.xlsx"
-CURRENT_TIME = int(time.time())
 
-S = SheetObject(path_to_data + roster_name,"submissions")
+S = SheetObject(PATH_TO_DATA + roster_name,"submissions")
 X = S.get({"new_submission":1})
 
 probs, dictX = dicts_by_key(['assignment','problem'],X)
@@ -43,51 +73,64 @@ no_matches = []
 for prob in probs:
     #INITIALIZE STUFF I NEED TO BUILD THE GRAPH
     V = [v['netid'] for v in dictX[prob]]
-    g = Graph()
-    for v in V:
-        g.add_node(v)
-        
-    indeg=2
-    outdeg=2
-      
-    degree_dict = {}
-    for v in V:
-        degree_dict[v] = {}
-        degree_dict[v]['in']=indeg
-        degree_dict[v]['out']=outdeg
+    V = kill_repeats(V) #not sure why we have repeats
     
+    
+    """
+    The method below still probably works.
+    """
+    #g = Graph()
+    #for v in V:
+    #    g.add_node(v)
+    #
+    #indeg=2
+    #outdeg=2
+    #
+    #degree_dict = {}
+    #for v in V:
+    #    degree_dict[v] = {}
+    #    degree_dict[v]['in']=indeg
+    #    degree_dict[v]['out']=outdeg
+    #
     #BUILD THE DIRECTED RANDOM GRAPH
-    worked = None
-    try:
-        g = get_random_graph(g,V,degree_dict,100)
-        #g=random_graph_spliced(g,V,degree_dict)
-        #make a dictionary of replacement entries
-        #replacement = {}
-        print("FOUND A MATCH:" + str(prob) + "\n")
-        worked = True
+    #worked = None
+    #try:
+    #    g = get_random_graph(g,V,degree_dict,100)
+    #    #g=random_graph_spliced(g,V,degree_dict)
+    #    make a dictionary of replacement entries
+    #    replacement = {}
+    #    print("FOUND A MATCH:" + str(prob) + "\n")
+    #    worked = True
+    #except ValueError as e:
+    #    print("could not match (problem, assignment)=" + str(prob) + "not enough entries")
+    #    no_matches.append(prob)
         
-    except ValueError as e:
-        print("could not match (problem, assignment):" + str(prob))
-        print(e)
-        print('\n')
+    n = len(V)
+    if n<=2:
+        print("could not match (problem,assignment)=" + str(prob) + ", not enough entries")
         no_matches.append(prob)
-        worked = False
         
-    if worked == True:
-        #for e in g.edges():
-        #    print(e)
-        
+    if n>=3:
+        g = get_easy_graph(V)
+        #print("SIZE")
+        #print(n)
+        #print("GRAPH")
+        for e in g.edges():
+            print(e)
         #for v in V:
         #    print(v)
         #    print(g.edges(to_node=v))
-            
+        print("FOUND A MATCH:" + str(prob) + "\n")
+        
         for v in V:
             #vv=match_key(dictX[prob],'netid',v)[0]
             vv = S.get({'assignment':prob[0],'problem':prob[1],'netid':v})[0]
             w = copyd(vv)
             reviewersv = [edge[0] for edge in g.edges(to_node=v)]
+            #print(len(reviewersv))
             w["reviewer1"] = reviewersv[0]
             w["reviewer2"] = reviewersv[1]
+            
             print(" * %s will be reviewed by %s and %s \n" % (v,reviewersv[0],reviewersv[1]))
             w["reviewer1_assignment_time"] = int(time.time()) #PHP style: =now-197? in sec
             w["reviewer2_assignment_time"] = int(time.time())
@@ -104,7 +147,8 @@ for prob in probs:
     we could store the graphs somewhere if we wanted...
     """
     
-print("\n Here are the (assignment,problems) we couldn't match:")
+print("""
+Here are the (assignment,problems) we couldn't match:""")
 print(no_matches)
         
         

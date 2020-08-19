@@ -38,13 +38,14 @@ def print_full_problem_report(sub):
     message += print_review(sub,2) + "\n"
     return message
     
-def print_filenames(sub,user):
+def print_filenames(sub,user,path_to_uploads):
     """
     returns the dict with 'datafile' and 'uploadfile' entries.
     datafile = name of relevant pdf in path_to_data/uploads/
     uploadfile = name of file that will be sent to the user in the email.
     """
-    ending = '-' + sub['submission_number'] + '-' + sub['assignment'] + sub['problem'] + '.pdf'
-    datafile = sub['user'] + ending
-    uploadfile = 'ForReview'+ending
+    ending1 = '-' + str(sub['submission_number']) + '-' + str(sub['assignment']) + '-'+str(sub['problem']) + '.pdf'
+    ending2 = '-' + str(sub['assignment']) + '-'+str(sub['problem']) + '.pdf'
+    datafile = path_to_uploads + sub['netid'] + ending2
+    uploadfile = 'ForReview'+ ending1
     return {'datafile':datafile, 'uploadfile':uploadfile}
