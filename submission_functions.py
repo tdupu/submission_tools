@@ -228,7 +228,7 @@ def increment_submission_number(path_to_data=PATH_TO_DATA):
     return "submission number: %s. " % variables['submission_number']
 
 def get_submission_count(path_to_data=PATH_TO_DATA):
-    f=open(path_to_variables_j,'r')
+    f=open(path_to_data + "variables.json",'r')
     variables=json.loads(f.read())
     f.close()
     return variables['submission_number']
@@ -437,26 +437,47 @@ def is_valid_review(user_id,submission_number,score,review,timestamp,path_to_dat
     if a previous review exists and its not the end of the day, write it.
     if a previous review exists and it its past the end of the day, kill it.
     """
-    CONSTANT_DATA = get_constant_data(path_to_data)
-    roster_name = CONSTANT_DATA['roster_name']
-    S=SheetObject(path_to_data + roster_name, "submissions")
-    entries = S.get({"submission_number":submission_number})
-    n = len(entries)
     j=-1 # returns reviewer number or zero
     message = '' #holy moly if you don't initialize this string it gets mad
     
-    if review == '':
+    """
+    try:
+        submission_number = int(submission_number)
+        #score = int(score)
+    except:
         j=0
-        message =""
+        message = ""
+    """
+    
+    
+    CONSTANT_DATA = get_constant_data(path_to_data)
+    roster_name = CONSTANT_DATA['roster_name']
+    S=SheetObject(path_to_data + roster_name, "submissions")
+    
+    n=0
+    
+    try:
+        submission_number = int(submission_number)
+        entries = S.get({"submission_number":submission_number})
+        n = len(entries)
+    except:
+        message = "" #"%s rejected" % submission_number
+        j=0
+    
+    
+    if review == '' and j!=0:
+        j=0
+        message = "*review of %s rejected. empty review. (if the review is a 10/10 then write something like 'perfect'.) <br>" % submission_number
     
     if n==0 and j!=0:
-        message = "*review of %s rejected. invalid submission number. <br>" % submission_number
+        message = "*review of %s rejected. empty database. <br>" % submission_number
         j=0
+        
     if n==1 and j!=0:
         submission = entries[0]
         old_entry = submission #keep a copy for the replace function later
         reviewer1 = submission['reviewer1']
-        reviewer2 = submission['reviewer1']
+        reviewer2 = submission['reviewer2']
         is_locked = [submission['review1_locked'],submission['review2_locked']]
     
         if user_id == reviewer1:
@@ -464,9 +485,12 @@ def is_valid_review(user_id,submission_number,score,review,timestamp,path_to_dat
         elif user_id == reviewer2:
             j=2
         else:
+            #message = """
+            #*review of %s rejected. incorrect reviewer. <br>
+            #""" % submission_number
             message = """
-            *review of %s rejected. incorrect reviewer. <br>
-            """ % submission_number
+            *review of %s rejected. incorrect reviewer. reviewers are %s and %s. <br>
+            """ % (submission_number, reviewer1,reviewer2)
             j=0
      
     if j>0 and is_locked[j-1]:
@@ -486,8 +510,13 @@ def is_valid_review(user_id,submission_number,score,review,timestamp,path_to_dat
         except:
             j=0
             message = """
-            review of %s rejected. score must be an integer. <br>
-            """ % submission_number
+            *review of %s rejected. score set to '%s'. must be an integer. <br>
+            """ % (submission_number,score)
+    
+    if j>0:
+        message = """
+        *review of %s recorded. score set to %s/10.<br>
+        """ % (submission_number,score)
     
     return message, j
     

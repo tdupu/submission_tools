@@ -40,7 +40,6 @@ ROSTER_NAME = CONSTANTS['roster_name']
 COURSE_NAME = CONSTANTS['course_name']
 PATH_TO_UPLOADS = PATH_TO_DATA + '/uploads/'
 
-
 from submission_functions import *
 
 """
@@ -81,9 +80,7 @@ if authenticated==1:
     """
     
     submission_message = """
-    <br>
-    SUBMISSIONS:
-    <br>
+    <h4> submissions </h4>
     """
     output_message = output_message + submission_message
     
@@ -191,22 +188,39 @@ if authenticated==1:
     """
     
     review_message = """
-    <br>
-    REVIEWS:
-    <br>
+    <h4> reviews </h4>
     """
     output_message = output_message + review_message
     
     for i in range(1,11):
+        
         user_id = data['user_id']
         timestamp = data['timestamp']
-        submission_number = data['subnumber%s' % i] #of the review
-        review = data['review%s' % i]
+        sub_number = data['subnumber%s' % i] #of the review
         score = data['score%s' % i]
+        review = data['review%s' % i]
         
-        message = write_review(user_id,submission_number,review,score,timestamp,PATH_TO_DATA)
+        try:
+            timestamp = int(data['timestamp'])
+            sub_number = int(data['subnumber%s' % i]) #of the review
+            score = int(data['score%s' % i])
+        except:
+            pass
+        
+        
+        message = write_review(user_id,sub_number,score,review,timestamp,PATH_TO_DATA)
         
         output_message = output_message + message
+
+output_message = output_message + """
+<br> <i>
+Resubmission will overwrite the current entry.
+Submissions are locked after two reviewers have been notified.
+Reviews are locked after a deadline or once two reviews have been recorded.
+Processing occurs at midnight every night.
+</i>
+<br>
+"""
 
 print(output_message)
 
