@@ -155,7 +155,7 @@ JSON FILE MANIPULATION: testing mode, server_switching.
 def get_constant_data(path_to_data=PATH_TO_DATA):
     variables = get_variables_data(path_to_data)
     test_on = variables['testing']
-    if test_on ==1:
+    if test_on==1:
         f = open(path_to_data + 'testing.json','r')
     if test_on==0:
         f = open(path_to_data + 'constants.json','r')
@@ -168,6 +168,20 @@ def get_variables_data(path_to_data=PATH_TO_DATA):
     variables = json.load(ff)
     ff.close()
     return variables
+    
+def get_test_mode(path_to_data=PATH_TO_DATA):
+    ff = open(path_to_data + 'variables.json','r')
+    variables = json.load(ff)
+    ff.close()
+    return variables['testing']
+    
+def get_roster_name(path_to_data=PATH_TO_DATA):
+    constants = get_constant_data(path_to_data)
+    return constants['roster_name']
+    
+def get_course_name(path_to_data=PATH_TO_DATA):
+    constants = get_constant_data(path_to_data)
+    return constants['course_name']
     
 def get_path_to_data(path_to_data=PATH_TO_DATA):
     constant_data = get_constant_data(path_to_data)

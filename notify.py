@@ -21,10 +21,14 @@ MORE INFORMATION ON HANDLING OPTIONS
 https://www.tutorialspoint.com/python/python_command_line_arguments.htm
 
 You call this scripts as follows:
-    python3 notify.py /path/to/data/ 0
+    python3 notify.py /path/to/data/ 0 1
 If you just run
     python3 notify.py
-It will assume the path like my local folder and that we are testing. I intend testing to be 1 and non-testing to be 0.
+It will assume the path like my local folder and that we are testing.
+Testing to be 1 and non-testing to be 0.
+The second flag will be emails and no-emails.
+To send the emails set it to 0.
+Email sending is by default off.
 """
 
 
@@ -32,7 +36,7 @@ It will assume the path like my local folder and that we are testing. I intend t
 """
 We decided to have three types of emails.
 
-Updates:
+Server Updates:
 these give any modification to the server in a batch email.
 
 Homework Results:
@@ -44,12 +48,6 @@ there are transmitted periodically.
 The present file gives a nightly update on progress.
 """
 
-
-"""
-Main script.
-"""
-
-
 #filename = "emails-%s.json" % mydate_s
 #path_to_variables_j = INSTALL_PATH + 'variables.json'
 #path_to_constants_j = INSTALL_PATH + 'constants.json'
@@ -58,24 +56,40 @@ Main script.
 #CONSTANTS=json.loads(f.read())
 #f.close()
 
-if len(sys.argv)>1:
-    PATH_TO_DATA = sys.argv[1]
-else:
-    PATH_TO_DATA = '/Users/taylordupuy/Documents/web-development/data/algebra-one/20/f/'
+"""
+PARSE INPUTS:
+"""
+if len(sys.argv)==1:
+    tmode(1)
+    PATH_TO_DATA = get_path_to_data()
+    DONT_SEND_EMAILS=1
 
-with open(PATH_TO_DATA+'constants.json','r') as f:
-    CONSTANTS=json.loads(f.read())
-    
-if len(sys.argv)>2:
-    if argv[2]==0:
-        roster_name = CONSTANTS['roster_name.xlsx']
-        course_name = CONSTANTS['course_name']
-    else:
-        roster_name = "roster-test.xlsx"
-        course_name = "Math 251"
+elif len(sys.argv)>=2:
+    PATH_TO_DATA = sys.argv[1]
+    tmode(1,PATH_TO_DATA)
+    DONT_SEND_EMAILS=1
+
+elif len(sys.argv)>=3:
+    IS_TEST = sys.argv[2]
+    tmode(IS_TEST,PATH_TO_DATA)
+
+elif len(sys.argv)==4:
+    DONT_SEND_EMAILS=sys.argv[3]
+
 else:
-    roster_name = "roster-test.xlsx"
-    course_name = "Math 251"
+    tmode(1)
+    DONT_SEND_EMAILS=1
+
+roster_name = get_roster_name(PATH_TO_DATA)
+course_name = get_course_name(PATH_TO_DATA)
+
+print("running notify.py... ")
+print("test mode: %s " % get_test_mode(PATH_TO_DATA))
+print("don't send emails: %s " % DONT_SEND_EMAILS)
+print("path to data: %s " % PATH_TO_DATA)
+print("roster name: %s " % roster_name)
+print("course name: %s " % course_name)
+
 
 PATH_TO_UPLOADS = PATH_TO_DATA + '/uploads/'
 
@@ -215,15 +229,14 @@ for user in users:
     emails[user]['message'] = message
 
 """
-SEND EMAILS
+EMAILS
 """
-
 path_to_emails = PATH_TO_DATA + 'emails-' + mydate_s +'.json'
 print("dumping emails: " + path_to_emails + "\n")
 with open(path_to_emails,'w') as outfile:
     json.dump(emails,outfile)
 
-if SEND_EMAILS==1:
+if DONT_SEND_EMAILS==0:
     print("sending emails: \n")
     for k in emails.keys():
         send_email(emails[k])

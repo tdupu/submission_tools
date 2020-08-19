@@ -2,10 +2,24 @@ import json
 import sys
 import time
 
-#sys.path.append('../excel_tools')
-#to get these paths I used the pwd unix command.
 
+"""
+BE SURE TO UPDATE THE ABSOLUTE INSTALL PATH:
+
+    test with path:
+        "matchmaker.py /path/to/data/ 1
+    test:
+        matchmaker.py
+    real deal:
+        matchmaker.py /path/to/data 0
+        
+    #sys.path.append('../excel_tools')
+    #to get these paths I used the pwd unix command.
+    
 PATH_TO_DATA = '/Users/taylordupuy/Documents/web-development/data/algebra-one/20/f/'
+
+"""
+
 INSTALL_PATH ='/Users/taylordupuy/Documents/web-development/dev/submission_tools/'
 sys.path.append(INSTALL_PATH+"../excel_tools")
 #sys.path.append('/Users/taylordupuy/Documents/web-development/dev/excel_tools')
@@ -15,42 +29,35 @@ from table_functions import *
 from matchmaker_functions import *
 from submission_functions import *
         
-path_to_variables_j = INSTALL_PATH + 'variables.json'
-path_to_constants_j = INSTALL_PATH + 'constants.json'
-path_to_testing_j = INSTALL_PATH + 'testing.json'
+#path_to_variables_j = INSTALL_PATH + 'variables.json'
+#path_to_constants_j = INSTALL_PATH + 'constants.json'
+#path_to_testing_j = INSTALL_PATH + 'testing.json'
 
 CURRENT_TIME = int(time.time())
 
 """
 PARSE INPUTS:
-test with path --- "matchmaker.py /path/to/data/ 1
-test --- matchmaker.py
-
-
 """
-
-
-if len(sys.argv)==2:
-    is_test = sys.argv[1]
-    if is_test ==1:
-        tmode(1)
-        roster_name = "roster-test.xlsx"
-    else:
-        tmode(0)
-elif len(sys.argv)==3:
+if len(sys.argv)==1:
+    PATH_TO_DATA = get_path_to_data()
+    tmode(1,PATH_TO_DATA)
+elif len(sys.argv)>=2:
     PATH_TO_DATA = sys.argv[1]
-    with open(PATH_TO_DATA+'variables.json','r') as f:
-        CONSTANTS = json.loads(constants.json)
-    roster_name = CONSTANTS['roster_name']
+    tmode(1,PATH_TO_DATA)
+elif len(sys.argv)==3:
     is_test = sys.argv[2]
-    if is_test ==1:
-        tmode(1)
-        roster_name = "roster-test.xlsx"
-    else:
-        tmode(0)
+    tmode(is_test,PATH_TO_DATA)
 else:
-    roster_name = "roster-test.xlsx"
     tmode(1)
+
+roster_name = get_roster_name(PATH_TO_DATA)
+course_name = get_course_name(PATH_TO_DATA)
+
+print("running matchmaker.py... ")
+print("test mode: %s " % get_test_mode(PATH_TO_DATA))
+print("path to data: %s " % PATH_TO_DATA)
+print("roster name: %s " % roster_name)
+print("course name: %s " % course_name)
 
 
 """
