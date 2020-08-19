@@ -7,12 +7,14 @@ import datetime
 
 INSTALL_PATH ='/Users/taylordupuy/Documents/web-development/dev/submission_tools/'
 sys.path.append(INSTALL_PATH + "../excel_tools/")
+sys.path.append(INSTALL_PATH + "../email_tools/")
 
 from table_editor import SheetObject
 from table_functions import *
 from matchmaker_functions import *
 from submission_functions import * #for shutting down server, setting values.
 from notify_functions import *
+from email_functions import *
 
 """
 MORE INFORMATION ON HANDLING OPTIONS
@@ -52,7 +54,6 @@ Main script.
 #path_to_variables_j = INSTALL_PATH + 'variables.json'
 #path_to_constants_j = INSTALL_PATH + 'constants.json'
 #path_to_testing_j = INSTALL_PATH + 'testing.json'
-
 #f = open(PATH_TO_DATA+'constants.json','r')
 #CONSTANTS=json.loads(f.read())
 #f.close()
@@ -76,6 +77,9 @@ else:
     roster_name = "roster-test.xlsx"
     course_name = "Math 251"
 
+PATH_TO_UPLOADS = PATH_TO_DATA + '/uploads/'
+
+
 #turn off the server
 webmode(0)
 
@@ -85,7 +89,15 @@ users = [student["netid"] for student in students]
 
 
 S = SheetObject(PATH_TO_DATA + roster_name, "submissions")
-updated_subs = kill_repeats(S.get({"new_submission":1})+S.get({"new_match":1})+S.get({"new_review1":1})+S.get({"new_review2":1}))
+new_matches = S.get({"new_match":1})
+new_completions = S.get({"new_completion":1})
+
+for sub in new_completions:
+    score1(sub,S)
+    score2(sub,S)
+
+updated_subs = kill_repeats(S.get({"new_submission":1})+S.get({"new_completion":1})+S.get({"new_review1":1})+S.get({"new_review2":1}))
+
 
 emails = {}
 
@@ -96,7 +108,6 @@ The email consists of four sections
 2) All your submissions that were recently closed, and the response
 3) All the referee reports you submitted (a receipt)
 4) All the new referee requests
-
 """
 
 
@@ -139,12 +150,12 @@ for user in users:
     
     ##############################
     %s SERVER UPDATES FOR %s
-    ############################## \n
+    ##############################
     """ % (user, mydate_s,user)
-    message_parts['open_submissions']= " \n YOUR OPEN SUBMISSIONS: \n  "
-    message_parts['new_closed_submissions'] = "\n NEW CLOSED SUBMISSIONS: \n "
-    message_parts['new_reviews'] = "\n REVIEWS YOU SUBMITTED: \n " #% user
-    message_parts['new_referee_requests'] = "\n NEW REFEREE REQUESTS (see attachments for files): \n"
+    message_parts['open_submissions']= "YOUR OPEN SUBMISSIONS: \n  "
+    message_parts['new_closed_submissions'] = "NEW CLOSED SUBMISSIONS: \n "
+    message_parts['new_reviews'] = "REVIEWS YOU SUBMITTED: \n " #% user
+    message_parts['new_referee_requests'] = "NEW REFEREE REQUESTS (see attachments for files): \n"
     message_parts['complete_message'] = """
     
     
@@ -168,7 +179,7 @@ for user in users:
                num_closed+=1
                
         else:
-            j = get_reviewer_index(user,sub)
+            j = get_reviewer_index(user,sub,S)
             
             if j!=0:
             
@@ -186,8 +197,7 @@ for user in users:
 
                         
         
-    #builds the message
-
+    #BUILD MESSAGE
     message = message_parts['header']
     
     if num_open>0:
@@ -202,12 +212,47 @@ for user in users:
     if num_requests>0:
         message+=message_parts['new_referee_requests']
         
-    #message_parts['complete_message']=message
     emails[user]['message'] = message
-    
-#WE MAYBE NEED TO DO MAKE AND APPEND METHOD:
-with open(PATH_TO_DATA + 'emails-' + mydate_s +'.json', 'w') as outfile:
+
+"""
+SEND EMAILS
+"""
+
+path_to_emails = PATH_TO_DATA + 'emails-' + mydate_s +'.json'
+print("dumping emails to json: " + path_to_emails + "\n")
+with open(path_to_emails,'w') as outfile:
     json.dump(emails,outfile)
 
-#turn webpage back on
+if SEND_EMAILS==1:
+    print("sending emails: \n")
+    for k in emails.keys():
+        send_email(emails[k])
+    
+"""
+CLEAN EVERYTHING UP
+"""
+for sub in new_matches:
+    message=unmark_new_match(sub,S)
+    print(message)
+    message=mark_locked(sub,S)
+    print(message)
+    
+for sub in new_completions:
+    message=unmark_new_completion(sub,S)
+    print(message)
+    message=unmark_newreview(sub,1,S)
+    print(message)
+    message=unmark_newreview(sub,2,S)
+    print(message)
+    message = mark_review_locked(sub,1,S)
+    print(message)
+    message = mark_review_locked(sub,2,S)
+    print(message)
+    message=mark_closed(sub)
+    print(message)
+
+
+"""
+TURN WEBPAGE BACK ON
+"""
 webmode(1)

@@ -73,47 +73,44 @@ def get_current_directory():
     path = os.path.dirname(os.path.abspath(filename))
     return path
     
-def set_key(sub,key,entry):
+def set_key(sub,key,entry,S):
     """
     WARNING: this currently doesn't check that the entry is valid.
     """
-    CONSTANT_DATA = get_CONSTANT_DATA()
-    path_to_data = CONSTANT_DATA['path_to_data']
-    roster_name = CONSTANT_DATA['roster_name']
-    S = SheetObject(path_to_data + roster_name,'submissions')
-    S.set(sub,key,entry)
-    message = S.save()
+    S.set_entry(sub,key,entry)
+    S.save()
+    message = '%s: %s=%s \n' % (sub['submission_number'],key,entry)
     return message
     
-def mark_closed(sub):
-    message = set_key(sub,'closed',1)
+def mark_closed(sub,S):
+    message = set_key(sub,'closed',1,S)
     return message
     
-def unmark_closed(sub):
-    message = set_key(sub,'closed',0)
+def unmark_closed(sub,S):
+    message = set_key(sub,'closed',0,S)
     return message
     
-def mark_new_completion(sub):
-    message = set_key(sub,'new_completion',1)
+def mark_new_completion(sub,S):
+    message = set_key(sub,'new_completion',1,S)
     return message
     
-def unmark_new_completion(sub):
-    message = set_key(sub,'new_completion',0)
+def unmark_new_completion(sub,S):
+    message = set_key(sub,'new_completion',0,S)
     return message
     
-def mark_new_match(sub):
-    message = set_key(sub, 'new_match',1)
+def mark_new_match(sub,S):
+    message = set_key(sub,'new_match',1,S)
     return message
     
-def unmark_new_match(sub):
-    message = set_key(sub,'new_match',0)
+def unmark_new_match(sub,S):
+    message = set_key(sub,'new_match',0,S)
     return message
     
-def mark_locked(sub):
-    message = set_key(sub,'submission_locked',1)
+def mark_locked(sub,S):
+    message = set_key(sub,'submission_locked',1,S)
     return message
     
-def get_reviewer_index(user,sub):
+def get_reviewer_index(user,sub,S):
     j=0
     if user == sub['reviewer1']:
         j=1
@@ -121,41 +118,37 @@ def get_reviewer_index(user,sub):
         j=2
     return j
     
-def unmark_new_review(sub,j):
+def unmark_new_review(sub,j,S):
     mykey = "new_review%s" % j
-    message = set_key(sub,mykey,0)
+    message = set_key(sub,mykey,0,S)
     return message
     
-def mark_new_review(sub,j):
+def mark_new_review(sub,j,S):
     mykey = "new_review%s" % j
-    message = set_key(sub,mykey,1)
+    message = set_key(sub,mykey,1,S)
     return message
 
-def mark_review_locked(sub,j):
+def mark_review_locked(sub,j,S):
     mykey = "review%s_locked" % j
-    message = set_key(sub,mykey,1)
+    message = set_key(sub,mykey,1,S)
     return message
 
-def unmark_review_locked(sub,j):
+def unmark_review_locked(sub,j,S):
     mykey = "review%s_locked" % j
-    message = set_key(sub,mykey,0)
+    message = set_key(sub,mykey,0,S)
     return message
     
-def score1(sub):
+def score1(sub,S):
     s1 = sub['reviewer1_score']
     s2 = sub['reviewer2_score']
     if s1>-1 and s2>-1:
         s = (s1+s1)/2
-        message = set_key(sub,'total_score1',s)
+        message = set_key(sub,'total_score1',s,S)
     else:
         raise ValueError("reviews are not complete")
     return message
     
-def score2(sub):
-    CONSTANT_DATA = get_CONSTANT_DATA()
-    path_to_data = CONSTANT_DATA['path_to_data']
-    roster_name = CONSTANT_DATA['roster_name']
-    S = SheetObject(path_to_data+roster_name,'submissions')
+def score2(sub,S):
     assignment = sub['assignment']
     problem = sub['problem']
     reviewer1 = sub['reviewer1']
@@ -174,7 +167,7 @@ def score2(sub):
         w2 = r2/(r1+r2)
         total_score2 = w1*s1 + w2*s2
         message = "the weighed average %s was recorded." % total_score2
-        set(sub,'total_score2',total_score2)
+        set_key(sub,'total_score2',total_score2,S)
     return message
     
     

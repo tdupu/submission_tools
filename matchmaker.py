@@ -74,8 +74,6 @@ for prob in probs:
     #INITIALIZE STUFF I NEED TO BUILD THE GRAPH
     V = [v['netid'] for v in dictX[prob]]
     V = kill_repeats(V) #not sure why we have repeats
-    
-    
     """
     The method below still probably works.
     """
