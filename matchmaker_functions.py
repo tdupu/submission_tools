@@ -165,5 +165,14 @@ def random_graph_spliced(g,V,degree_dict):
     else:
         W = V[1:]
         return splice(random_graph_spliced(g,W,degree_dict),V[0],degree_dict[V[0]]['in'])
+        
+def get_easy_graph(mylist):
+    random_list = np.random.permutation(mylist)
+    n=len(mylist)
+    g = Graph()
+    for i in range(n):
+        g.add_edge(random_list[i%n],random_list[(i+1)%n])
+        g.add_edge(random_list[i%n],random_list[(i+2)%n])
+    return g
     
 

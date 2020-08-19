@@ -1,19 +1,44 @@
-"""
-Different things happen depending on if you run python3 or python on this file.
-"""
 
+"""
+Usage:
+
+Testing mode off
+    python3 new_submission.py PATH_TO_DATA 0
+Testing mode on
+    python3 new_submission.py PATH_TO_DATA 1
+Default Algebra file
+    python3 new_submission.py
+
+
+NOTES:
+--Different things happen depending on if you run python3 or python on this file.
+--Always use absolute paths.
+--Information about the particular course is stored in constants.json which you can load as a python dictionary. It should path_to_data, roster_name, course_name information. Git does not track this file.
+"""
 
 import json
 import sys
-sys.path.append('..')
 from submission_functions import *
 
 """
-note to devs:
-modify constant.json with your information.
+HANDLE OPTIONS
 """
 
-path_to_data = get_path_to_data() #rooted from where jupyter was launched
+if len(sys.argv)>1:
+    PATH_TO_DATA = sys.argv[1]
+else:
+    PATH_TO_DATA = '/Users/taylordupuy/Documents/web-development/data/algebra-one/20/f/'
+    
+if len(sys.argv)>2:
+    k = sys.argv[2]
+    tmode(k,PATH_TO_DATA)
+else:
+    tmode(1,PATH_TO_DATA)
+
+CONSTANTS = get_constant_data(PATH_TO_DATA)
+ROSTER_NAME = CONSTANTS['roster_name']
+COURSE_NAME = CONSTANTS['course_name']
+PATH_TO_UPLOADS = PATH_TO_DATA + '/uploads/'
 
 from submission_functions import *
 
@@ -21,12 +46,17 @@ from submission_functions import *
 START PROCESSING DATA
 """
 
-temp_filename = "temp.json"
-f = open(path_to_data+temp_filename,'r')
+#THIS FILE IS WHERE THE INFORMATION FROM upload.php IS SENT.
+f = open(PATH_TO_DATA+"temp.json",'r')
 data=json.loads(f.read())
 f.close()
 
-#startwriting down things
+
+"""
+AUTHENTICATE USER
+"""
+
+#AUTHENTICATION DATA
 user_id = data['user_id']
 pass1 = data['password']
 pass2 = data['password2']
@@ -34,18 +64,13 @@ newpass = data['new_password']
 
 output_message = ""
 
-"""
-AUTHENTICATE USER
-"""
-
 #print(data)
 
-message,authenticated = authenticate(user_id,pass1,pass2,newpass)
+message,authenticated = authenticate(user_id,pass1,pass2,newpass,PATH_TO_DATA)
 output_message = output_message + message
 
 #for processing if the file should even be considered for upload
-temp_filename2 = "temp2.json"
-f2 = open(path_to_data+temp_filename2,'r')
+f2 = open(PATH_TO_DATA+"temp2.json",'r')
 data2=json.load(f2)
 f2.close()
 
@@ -55,9 +80,7 @@ if authenticated==1:
     """
     
     submission_message = """
-    <br>
-    SUBMISSIONS:
-    <br>
+    <h4> submissions </h4>
     """
     output_message = output_message + submission_message
     
@@ -66,7 +89,7 @@ if authenticated==1:
     
     for i in range(1,6):
         query = {}
-        submission_number = get_submission_count()
+        submission_number = get_submission_count(PATH_TO_DATA)
         
         """
         There was some massive crude-ass debugging that went on here.
@@ -138,11 +161,11 @@ if authenticated==1:
             
             #The next step checks to see if this is a made up problem.
         
-        elif is_valid_assignment(assignment,problem,timestamp):
+        elif is_valid_assignment(assignment,problem,timestamp,PATH_TO_DATA):
             query['user_id'] = user_id
             query['assignment'] = assignment
             query['problem'] = problem
-            message,dataEntry = submit_problem(user_id,assignment,problem,timestamp)
+            message,dataEntry = submit_problem(user_id,assignment,problem,timestamp,PATH_TO_DATA)
         
         else:
             message = """
@@ -156,7 +179,7 @@ if authenticated==1:
         
     #temp3.json will be read by the upload.php
     #used to determine if one should attempt to upload the PDFs
-    with open(path_to_data + 'temp3.json', 'w') as outfile:
+    with open(PATH_TO_DATA + 'temp3.json', 'w') as outfile:
         json.dump(data3,outfile)
         
     
@@ -165,22 +188,39 @@ if authenticated==1:
     """
     
     review_message = """
-    <br>
-    REVIEWS:
-    <br>
+    <h4> reviews </h4>
     """
     output_message = output_message + review_message
     
     for i in range(1,11):
+        
         user_id = data['user_id']
         timestamp = data['timestamp']
-        submission_number = data['subnumber%s' % i] #of the review
-        review = data['review%s' % i]
+        sub_number = data['subnumber%s' % i] #of the review
         score = data['score%s' % i]
+        review = data['review%s' % i]
         
-        message = write_review(user_id,submission_number,review,score,timestamp)
+        try:
+            timestamp = int(data['timestamp'])
+            sub_number = int(data['subnumber%s' % i]) #of the review
+            score = int(data['score%s' % i])
+        except:
+            pass
+        
+        
+        message = write_review(user_id,sub_number,score,review,timestamp,PATH_TO_DATA)
         
         output_message = output_message + message
+
+output_message = output_message + """
+<br> <i>
+Resubmission will overwrite the current entry.
+Submissions are locked after two reviewers have been notified.
+Reviews are locked after a deadline or once two reviews have been recorded.
+Processing occurs at midnight every night.
+</i>
+<br>
+"""
 
 print(output_message)
 
