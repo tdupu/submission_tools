@@ -219,7 +219,7 @@ SEND EMAILS
 """
 
 path_to_emails = PATH_TO_DATA + 'emails-' + mydate_s +'.json'
-print("dumping emails to json: " + path_to_emails + "\n")
+print("dumping emails: " + path_to_emails + "\n")
 with open(path_to_emails,'w') as outfile:
     json.dump(emails,outfile)
 

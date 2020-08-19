@@ -12,14 +12,14 @@ import os
 import inspect
 
 INSTALL_PATH ='/Users/taylordupuy/Documents/web-development/dev/submission_tools/'
+PATH_TO_DATA = '/Users/taylordupuy/Documents/web-development/data/algebra-one/20/f/'
 sys.path.append(INSTALL_PATH + "../excel_tools")
 
 #sys.path.append('../excel_tools')
 #sys.path.append('/Users/taylordupuy/Documents/web-development/dev/excel_tools')
 
-path_to_variables_j = INSTALL_PATH + 'variables.json'
-path_to_constants_j = INSTALL_PATH + 'constants.json'
-path_to_testing_j = INSTALL_PATH + 'testing.json'
+with open(PATH_TO_DATA + 'variables.json','r') as ff:
+    variables = json.load(ff)
 
 from table_editor import SheetObject
 from table_functions import *
@@ -48,30 +48,7 @@ For total_score2:
     
 """
 
-def get_CONSTANT_DATA():
-    ff = open(path_to_variables_j,'r')
-    variables = json.load(ff)
-    ff.close()
-    test_on = variables['testing']
 
-    if test_on ==1:
-        f = open(path_to_testing_j,'r')
-        
-    if test_on==0:
-        f = open(path_to_constants_j,'r')
-        
-    CONSTANT_DATA = json.load(f)
-    f.close()
-    return CONSTANT_DATA
-    
-def get_path_to_data():
-    CONSTANT_DATA = get_CONSTANT_DATA()
-    return CONSTANT_DATA['path_to_data']
-
-def get_current_directory():
-    filename = inspect.getframeinfo(inspect.currentframe()).filename
-    path = os.path.dirname(os.path.abspath(filename))
-    return path
     
 def set_key(sub,key,entry,S):
     """
@@ -175,46 +152,72 @@ def score2(sub,S):
 JSON FILE MANIPULATION: testing mode, server_switching.
 """
 
-def tmode(j):
+def get_constant_data(path_to_data=PATH_TO_DATA):
+    variables = get_variables_data(path_to_data)
+    test_on = variables['testing']
+    if test_on ==1:
+        f = open(path_to_data + 'testing.json','r')
+    if test_on==0:
+        f = open(path_to_data + 'constants.json','r')
+    constant_data = json.load(f)
+    f.close()
+    return constant_data
+    
+def get_variables_data(path_to_data=PATH_TO_DATA):
+    ff = open(path_to_data + 'variables.json','r')
+    variables = json.load(ff)
+    ff.close()
+    return variables
+    
+def get_path_to_data(path_to_data=PATH_TO_DATA):
+    constant_data = get_constant_data(path_to_data)
+    return constant_data['path_to_data']
+
+def get_current_directory():
+    filename = inspect.getframeinfo(inspect.currentframe()).filename
+    path = os.path.dirname(os.path.abspath(filename))
+    return path
+
+def tmode(j,path_to_data=PATH_TO_DATA):
     """
     Note: this function is named so weirdly because set_test_mode and set_testing_mode seem to be taken by python.
     
     This turns testing mode on and off.
     """
-    f=open(path_to_variables_j,'r')
+    f=open(path_to_data+ 'variables.json','r')
     variables=json.load(f)
     f.close()
     variables['testing'] = j
-    with open(path_to_variables_j, 'w') as outfile:
+    with open(path_to_data + 'variables.json', 'w') as outfile:
         json.dump(variables,outfile)
     if j==0:
-        message = "testing mod off."
+        message = "testing mod off. \n"
     if j==1:
-        message = "testing mode on."
+        message = "testing mode on. \n"
     return message
     
-def webmode(j):
+def webmode(j,path_to_data=PATH_TO_DATA):
     """
     set_test_mode
     set_testing_mode
     
     Seem to be taken or something...
     """
-    f=open(path_to_variables_j,'r')
+    f=open(path_to_data + 'variables.json','r')
     variables=json.load(f)
     f.close()
     variables['server_down'] = j
-    with open(path_to_variables_j, 'w') as outfile:
+    with open(path_to_data+'variables.json', 'w') as outfile:
         json.dump(variables,outfile)
     if j==0:
-        message = "webpage off."
+        message = "webpage off. \n"
     if j==1:
-        message = "webpage on."
+        message = "webpage on. \n"
     return message
     
 
-def increment_submission_number():
-    f=open(path_to_variables_j,'r')
+def increment_submission_number(path_to_data=PATH_TO_DATA):
+    f=open(path_to_data,'r')
     variables=json.loads(f.read())
     f.close()
     variables['submission_number'] = variables['submission_number']+1
@@ -224,7 +227,7 @@ def increment_submission_number():
     
     return "submission number: %s. " % variables['submission_number']
 
-def get_submission_count():
+def get_submission_count(path_to_data=PATH_TO_DATA):
     f=open(path_to_variables_j,'r')
     variables=json.loads(f.read())
     f.close()
@@ -237,9 +240,8 @@ MAIN FUNCTIONS
 #########################
 """
 
-def authenticate(user_id, pass1, pass2, newpass):
-    CONSTANT_DATA = get_CONSTANT_DATA()
-    path_to_data = CONSTANT_DATA['path_to_data']
+def authenticate(user_id, pass1, pass2, newpass,path_to_data=PATH_TO_DATA):
+    CONSTANT_DATA = get_constant_data(path_to_data)
     roster_name = CONSTANT_DATA['roster_name']
     R = SheetObject(path_to_data + roster_name,'roster')
     students = R.get({'netid':user_id})
@@ -271,9 +273,8 @@ def authenticate(user_id, pass1, pass2, newpass):
         
     return message, authenticated
 
-def is_valid_assignment(assignment, problem, timestamp, check_due_date=False):
-    CONSTANT_DATA = get_CONSTANT_DATA()
-    path_to_data = CONSTANT_DATA['path_to_data']
+def is_valid_assignment(assignment, problem, timestamp, check_due_date=False, path_to_data=PATH_TO_DATA):
+    CONSTANT_DATA = get_constant_data(path_to_data)
     roster_name = CONSTANT_DATA['roster_name']
     A = SheetObject(path_to_data+roster_name,'assignments')
     
@@ -316,12 +317,11 @@ def is_valid_assignment(assignment, problem, timestamp, check_due_date=False):
     if n>0:
         raise ValueError("Assignment data is inconsistent. Please contact Professor Dupuy with this error message. <br>")
 
-def submit_problem(user_id,assignment,problem,timestamp, check_due_date=False):
+def submit_problem(user_id,assignment,problem,timestamp,path_to_data=PATH_TO_DATA,check_due_date=False):
     """
     
     """
-    CONSTANT_DATA = get_CONSTANT_DATA()
-    path_to_data = CONSTANT_DATA['path_to_data']
+    CONSTANT_DATA = get_constant_data(path_to_data)
     roster_name = CONSTANT_DATA['roster_name']
     S = SheetObject(path_to_data + roster_name,'submissions')
     query = {'netid':user_id, 'assignment':assignment,'problem':problem}
@@ -331,7 +331,7 @@ def submit_problem(user_id,assignment,problem,timestamp, check_due_date=False):
         write_file = 1
         
         if n==0:
-            new_submission_number = get_submission_count()
+            new_submission_number = get_submission_count(path_to_data)
             new_entry = {}
             new_entry['netid'] = user_id
             new_entry['assignment'] = assignment
@@ -379,7 +379,7 @@ def submit_problem(user_id,assignment,problem,timestamp, check_due_date=False):
             for key in S.set_of_keys:
                 new_entry[key] = old_entry[key]
             
-            new_submission_number = get_submission_count()
+            new_submission_number = get_submission_count(path_to_data)
             #new_entry['netid'] = user_id
             #new_entry['assignment'] = assignment
             #new_entry['problem'] = problem
@@ -411,7 +411,7 @@ def submit_problem(user_id,assignment,problem,timestamp, check_due_date=False):
             write_file =0
             
         if write_file ==1:
-            increment_submission_number()
+            increment_submission_number(path_to_data)
     
     else:
         message = """
@@ -427,7 +427,7 @@ def submit_problem(user_id,assignment,problem,timestamp, check_due_date=False):
         dataentry["submission_number"]=-1
     return message,dataentry
 
-def is_valid_review(user_id,submission_number,score,review,timestamp):
+def is_valid_review(user_id,submission_number,score,review,timestamp,path_to_data=PATH_TO_DATA):
     """
     returns a message and reviewer number if valid.
     returns a message and j=0 if not valid.
@@ -437,8 +437,7 @@ def is_valid_review(user_id,submission_number,score,review,timestamp):
     if a previous review exists and its not the end of the day, write it.
     if a previous review exists and it its past the end of the day, kill it.
     """
-    CONSTANT_DATA = get_CONSTANT_DATA()
-    path_to_data = CONSTANT_DATA['path_to_data']
+    CONSTANT_DATA = get_constant_data(path_to_data)
     roster_name = CONSTANT_DATA['roster_name']
     S=SheetObject(path_to_data + roster_name, "submissions")
     entries = S.get({"submission_number":submission_number})
@@ -492,12 +491,11 @@ def is_valid_review(user_id,submission_number,score,review,timestamp):
     
     return message, j
     
-def write_review(user_id,submission_number,score,review,timestamp):
-    message,j=is_valid_review(user_id,submission_number,score,review,timestamp)
+def write_review(user_id,submission_number,score,review,timestamp,path_to_data=PATH_TO_DATA):
+    message,j=is_valid_review(user_id,submission_number,score,review,timestamp,path_to_data)
         
     if j!=0: #write the review
-        CONSTANT_DATA = get_CONSTANT_DATA()
-        path_to_data = CONSTANT_DATA['path_to_data']
+        CONSTANT_DATA = get_constant_data()
         roster_name = CONSTANT_DATA['roster_name']
         S=SheetObject(path_to_data + roster_name, "submissions")
         
