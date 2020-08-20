@@ -1,3 +1,5 @@
+#!/usr/local/bin/python36
+#/usr/bin/env python3
 
 """
 Usage:
