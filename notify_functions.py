@@ -21,7 +21,7 @@ def print_review(sub,j):
                 score: %s
                 comments: %s
                 
-        """ % (sub['reviewer%s_score' %j],sub('review%s' %j))
+        """ % (sub['reviewer%s_score' %j],sub['review%s' %j])
     return message
         
 def print_final_score(sub):
@@ -31,7 +31,7 @@ def print_final_score(sub):
     """ % sub['total_score1','total_score2']
             
 def print_full_problem_report(sub):
-    message = print_header(sub) + "\n"
+    message = print_submission_header(sub) + "\n"
     message =+ "    reviewer 1 \n"
     message += print_review(sub,1) + "\n"
     message =+ "    reviewer 2 \n"
