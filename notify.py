@@ -243,27 +243,69 @@ if DONT_SEND_EMAILS==0:
     
 """
 CLEAN EVERYTHING UP
+submission_number
+submission_locked
+netid
+assignment
+problem
+closed
+submission_time
+total_score1
+total_score2
+reviewer1_assignment_time
+reviewer1
+reviewer1_score
+review1
+review1_timestamp
+review1_locked
+reviewer2_assignment_time
+reviewer2
+reviewer2_score
+review2
+review2_timestamp
+review2_locked
+new_submission
+new_match
+new_review1
+new_review2
+new_completion
 """
-for sub in new_matches:
-    message=unmark_new_match(sub,S)
-    print(message)
-    message=mark_locked(sub,S)
-    print(message)
-    
-for sub in new_completions:
-    message=unmark_new_completion(sub,S)
-    print(message)
-    message=unmark_newreview(sub,1,S)
-    print(message)
-    message=unmark_newreview(sub,2,S)
-    print(message)
-    message = mark_review_locked(sub,1,S)
-    print(message)
-    message = mark_review_locked(sub,2,S)
-    print(message)
-    message=mark_closed(sub)
-    print(message)
 
+for sub in new_matches:
+    new_entry = copyd(sub)
+    new_entry["new_match"]=0
+    new_entry["submission_locked"]=1
+    #message=unmark_new_match(sub,S)
+    #print(message)
+    #message=mark_locked(sub,S)
+    #print(message)
+    S.replace(new_entry,sub)
+    print("s%: new_match =0, submission_locked=1 \n" % sub[submission_number])
+
+for sub in new_completions:
+"""
+THIS IS BUGGY.
+"""
+    new_entry = copyd(sub)
+    new_entry["new_completion"]=0
+    new_entry["new_review1"]=0
+    new_entry["new_review2"]=0
+    new_entry["review1_locked"]=1
+    new_entry["review2_locked"]=1
+    S.replace(new_entry,sub)
+    print("s%: new_completion=0, new_review1=0, new_review2=0, review1_locked=1, review2_locked=1 \n" % new_entry["submission_number"])
+    #message=unmark_new_completion(sub,S)
+    #print(message)
+    #message=unmark_newreview(sub,1,S)
+    #print(message)
+    #message=unmark_newreview(sub,2,S)
+    #print(message)
+    #message = mark_review_locked(sub,1,S)
+    #print(message)
+    #message = mark_review_locked(sub,2,S)
+    #print(message)
+    #message=mark_closed(sub)
+    #print(message)
 
 """
 TURN WEBPAGE BACK ON
