@@ -205,7 +205,7 @@ for user in users:
                     emails[user]['attachments'].append(print_filenames(sub,owner,PATH_TO_DATA + "uploads/"))
                         
                 elif sub['new_review%s' % j]==1:
-                    message_parts['new_reviews']+= print_header(sub)
+                    message_parts['new_reviews']+= print_submission_header(sub)
                     message_parts['new_reviews']+= print_review(sub,j)
                     num_revs+=1
 
@@ -242,7 +242,9 @@ if DONT_SEND_EMAILS==0:
         send_email(emails[k])
     
 """
-CLEAN EVERYTHING UP
+CLEAN EVERYTHING UP.
+
+KEYS:
 submission_number
 submission_locked
 netid
@@ -279,21 +281,24 @@ for sub in new_matches:
     #print(message)
     #message=mark_locked(sub,S)
     #print(message)
-    S.replace(new_entry,sub)
-    print("s%: new_match =0, submission_locked=1 \n" % sub[submission_number])
+    S.replace(sub,new_entry)
+    S.save()
+    print("%s: new_match =0, submission_locked=1 \n" % sub["submission_number"])
 
 for sub in new_completions:
-"""
-THIS IS BUGGY.
-"""
-    new_entry = copyd(sub)
+    """
+    THIS IS BUGGY.
+    """
+    mysub = S.get({"submission_number":sub["submission_number"]}) #to preserve scores
+    new_entry = copyd(mysub)
     new_entry["new_completion"]=0
     new_entry["new_review1"]=0
     new_entry["new_review2"]=0
     new_entry["review1_locked"]=1
     new_entry["review2_locked"]=1
-    S.replace(new_entry,sub)
-    print("s%: new_completion=0, new_review1=0, new_review2=0, review1_locked=1, review2_locked=1 \n" % new_entry["submission_number"])
+    S.replace(mysub,new_entry)
+    S.save()
+    print("%s: new_completion=0, new_review1=0, new_review2=0, review1_locked=1, review2_locked=1 \n" % new_entry["submission_number"])
     #message=unmark_new_completion(sub,S)
     #print(message)
     #message=unmark_newreview(sub,1,S)
@@ -306,6 +311,7 @@ THIS IS BUGGY.
     #print(message)
     #message=mark_closed(sub)
     #print(message)
+    
 
 """
 TURN WEBPAGE BACK ON
