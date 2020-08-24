@@ -201,6 +201,7 @@ def tmode(j,path_to_data=PATH_TO_DATA):
     
     This turns testing mode on and off.
     """
+    j = int(j)
     f=open(path_to_data+ 'variables.json','r')
     variables=json.load(f)
     f.close()
