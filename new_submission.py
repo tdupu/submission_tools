@@ -35,6 +35,7 @@ elif len(sys.argv)==2:
 elif len(sys.argv)==3:
     PATH_TO_DATA = sys.argv[1]
     is_test = sys.argv[2]
+    print("testing: %s \n" % is_test)
     tmode(is_test,PATH_TO_DATA)
 else:
     PATH_TO_DATA = get_path_to_data()
