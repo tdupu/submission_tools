@@ -33,9 +33,11 @@ elif len(sys.argv)==2:
     PATH_TO_DATA = sys.argv[1]
     tmode(1,PATH_TO_DATA)
 elif len(sys.argv)==3:
+    PATH_TO_DATA = sys.argv[1]
     is_test = sys.argv[2]
     tmode(is_test,PATH_TO_DATA)
 else:
+    PATH_TO_DATA = get_path_to_data()
     tmode(1)
 
 CONSTANTS = get_constant_data(PATH_TO_DATA)
