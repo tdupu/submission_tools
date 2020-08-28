@@ -12,18 +12,21 @@ import os
 import inspect
 
 #INSTALL_PATH ='/Users/taylordupuy/Documents/web-development/dev/submission_tools/'
-INSTALL_PATH='/users/t/d/tdupuy/dev/submission_tools/'
+#INSTALL_PATH='/users/t/d/tdupuy/dev/submission_tools/'
+INSTALL_PATH='/users/t/d/tdupuy/www-root/dev/submission/tools/'
 
 
 #PATH_TO_DATA = '/Users/taylordupuy/Documents/web-development/data/algebra-one/20/f/'
-PATH_TO_DATA = '/users/t/d/tdupuy/data/algebra-one/20/f/'
+#PATH_TO_DATA = '/users/t/d/tdupuy/data/algebra-one/20/f/'
+PATH_TO_DATA = '/users/t/d/tdupuy/www-root/data/algebra-one/20/f/'
 
-sys.path.append(INSTALL_PATH + "../excel_tools")
+sys.path.append('/users/t/d/tdupuy/www-root/dev/excel_tools')
+#sys.path.append(INSTALL_PATH + "../excel_tools")
 #sys.path.append('../excel_tools')
 #sys.path.append('/Users/taylordupuy/Documents/web-development/dev/excel_tools')
 
-with open(PATH_TO_DATA + 'variables.json','r') as ff:
-    variables = json.load(ff)
+#with open(PATH_TO_DATA + 'variables.json','r') as ff:
+#    variables = json.load(ff)
 
 from table_editor import SheetObject
 from table_functions import *
@@ -236,11 +239,11 @@ def webmode(j,path_to_data=PATH_TO_DATA):
     
 
 def increment_submission_number(path_to_data=PATH_TO_DATA):
-    f=open(path_to_data,'r')
+    f=open(path_to_data + "variables.json",'r')
     variables=json.loads(f.read())
     f.close()
     variables['submission_number'] = variables['submission_number']+1
-    f = open(path_to_variables_j,'w')
+    f = open(path_to_data+"variables.json",'w')
     json.dump(variables,f)
     f.close()
     
