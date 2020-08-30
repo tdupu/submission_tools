@@ -20,7 +20,8 @@ PATH_TO_DATA = '/Users/taylordupuy/Documents/web-development/data/algebra-one/20
 
 """
 
-INSTALL_PATH ='/Users/taylordupuy/Documents/web-development/dev/submission_tools/'
+INSTALL_PATH = '/users/t/d/tdupuy/dev/submission_tools/'
+#INSTALL_PATH ='/Users/taylordupuy/Documents/web-development/dev/submission_tools/'
 sys.path.append(INSTALL_PATH+"../excel_tools")
 #sys.path.append('/Users/taylordupuy/Documents/web-development/dev/excel_tools')
 

@@ -5,7 +5,8 @@ import time
 import datetime
 
 
-INSTALL_PATH ='/Users/taylordupuy/Documents/web-development/dev/submission_tools/'
+INSTALL_PATH = "/users/t/d/tdupuy/dev/submission_tools/"
+#INSTALL_PATH ='/Users/taylordupuy/Documents/web-development/dev/submission_tools/'
 sys.path.append(INSTALL_PATH + "../excel_tools/")
 sys.path.append(INSTALL_PATH + "../email_tools/")
 
@@ -64,18 +65,23 @@ if len(sys.argv)==1:
     PATH_TO_DATA = get_path_to_data()
     DONT_SEND_EMAILS=1
 
-elif len(sys.argv)>=2:
+elif len(sys.argv)==2:
     PATH_TO_DATA = sys.argv[1]
     tmode(1,PATH_TO_DATA)
     DONT_SEND_EMAILS=1
 
-elif len(sys.argv)>=3:
+elif len(sys.argv)==3:
+    PATH_TO_DATA = sys.argv[1]
     IS_TEST = sys.argv[2]
+    DONT_SEND_EMAIL=1
     tmode(IS_TEST,PATH_TO_DATA)
 
 elif len(sys.argv)==4:
+    PATH_TO_DATA = sys.argv[1]
+    IS_TEST = sys.argv[2]
     DONT_SEND_EMAILS=sys.argv[3]
-
+    tmode(IS_TEST,PATH_TO_DATA)
+    
 else:
     tmode(1)
     DONT_SEND_EMAILS=1
