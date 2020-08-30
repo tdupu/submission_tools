@@ -25,41 +25,49 @@ from submission_functions import *
 """
 HANDLE OPTIONS
 """
+#print(len(sys.argv))
+#print(sys.argv)
 
 if len(sys.argv)==1:
-    PATH_TO_DATA = get_path_to_data()
+    #PATH_TO_DATA = get_path_to_data()
+    print("one arg")
     tmode(1,PATH_TO_DATA)
-elif len(sys.argv)==2:
+
+if len(sys.argv)==2:
     PATH_TO_DATA = sys.argv[1]
     tmode(1,PATH_TO_DATA)
-elif len(sys.argv)==3:
+
+if len(sys.argv)==3:
     PATH_TO_DATA = sys.argv[1]
     is_test = sys.argv[2]
     print("testing: %s \n" % is_test)
     tmode(is_test,PATH_TO_DATA)
-else:
-    PATH_TO_DATA = get_path_to_data()
-    tmode(1)
+
+#else:
+#    PATH_TO_DATA = get_path_to_data()
+#    tmode(1)
+
 
 CONSTANTS = get_constant_data(PATH_TO_DATA)
 ROSTER_NAME = get_roster_name(PATH_TO_DATA)
 COURSE_NAME = get_course_name(PATH_TO_DATA)
 PATH_TO_UPLOADS = PATH_TO_DATA + '/uploads/'
 
-print("running new_submission.py... ")
-print("test mode: %s " % get_test_mode(PATH_TO_DATA))
-print("path to data: %s " % PATH_TO_DATA)
-print("roster name: %s " % ROSTER_NAME)
-print("course name: %s " % COURSE_NAME)
 
+print("running new_submission.py... <br> ")
+print("test mode: %s <br>" % get_test_mode(PATH_TO_DATA))
+print("path to data: %s <br>" % PATH_TO_DATA)
+print("roster name: %s <br>" % ROSTER_NAME)
+print("course name: %s <br> <br>" % COURSE_NAME)
+print("###################### <br>")
 
-from submission_functions import *
 
 """
 START PROCESSING DATA
 """
 
 #THIS FILE IS WHERE THE INFORMATION FROM upload.php IS SENT.
+#print(PATH_TO_DATA + "temp.json")
 f = open(PATH_TO_DATA+"temp.json",'r')
 data=json.loads(f.read())
 f.close()
