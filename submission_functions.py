@@ -262,7 +262,7 @@ MAIN FUNCTIONS
 #########################
 """
 
-def authenticate(user_id, pass1, pass2, newpass,path_to_data=PATH_TO_DATA):
+def authenticate(user_id, pass1, newpass1, newpass2,path_to_data=PATH_TO_DATA):
     CONSTANT_DATA = get_constant_data(path_to_data)
     roster_name = CONSTANT_DATA['roster_name']
     R = SheetObject(path_to_data + roster_name,'roster')
@@ -277,10 +277,14 @@ def authenticate(user_id, pass1, pass2, newpass,path_to_data=PATH_TO_DATA):
         password = old_entry['password']
         if password == pass1:
             authenticated = 1
-            if pass1 == pass2 and len(newpass) >0:
-                new_entry = old_entry
-                new_entry['password'] = newpass
-                message = "new password has been set. <br> "
+            if newpass1 == newpass2 and len(newpass1) >0:
+                new_entry = copyd(old_entry)
+                new_entry['password'] = newpass1
+                R.replace(old_entry,new_entry)
+                R.save()
+                message = "new password has been set. <br>"
+                
+                
             else:
                 message = "<i> %s upload report </i> <br>" % user_id
         else:
