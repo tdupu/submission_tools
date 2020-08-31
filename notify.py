@@ -101,7 +101,7 @@ PATH_TO_UPLOADS = PATH_TO_DATA + '/uploads/'
 
 
 #turn off the server
-webmode(0)
+webmode(0,PATH_TO_DATA)
 
 R = SheetObject(PATH_TO_DATA + roster_name, "roster")
 students = R.get({})
@@ -324,4 +324,4 @@ for sub in new_completions:
 """
 TURN WEBPAGE BACK ON
 """
-webmode(1)
+webmode(1,PATH_TO_DATA)
