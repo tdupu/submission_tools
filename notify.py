@@ -120,6 +120,8 @@ for sub in new_completions:
 
 updated_subs = kill_repeats(S.get({"new_submission":1})+S.get({"new_completion":1})+S.get({"new_review1":1})+S.get({"new_review2":1}))
 
+open_submissions=S.get({"closed":0})
+
 print('updated submissions \n')
 for sub in updated_subs:
     for k in sub.keys():
@@ -192,7 +194,8 @@ for user in users:
     num_revs = 0
     num_requests = 0
 
-    for sub in updated_subs:
+#    for sub in updated_subs:
+    for sub in open_submissions:
         if sub['netid']==user:
             
             if sub['new_completion']==0:
