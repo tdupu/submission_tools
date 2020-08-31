@@ -9,9 +9,10 @@ def date(unixtime, format = '%m/%d/%Y %H:%M'):
     return d.strftime(format)
     
 def review_assignment_time(sub):
-    if len(sub['reviewer1'])>0:
-        return date(sub['reviewer1_assignment_time'])
-    else:
+    try:
+        if len(sub['reviewer1'])>0:
+            return date(sub['reviewer1_assignment_time'])
+    except:
         return "NA"
     
 
