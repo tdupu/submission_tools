@@ -249,8 +249,11 @@ print("DONT_SEND_EMAILS:%s \n" % DONT_SEND_EMAILS)
 if DONT_SEND_EMAILS==0:
     print("sending emails: \n")
     for k in emails.keys():
-        out_msg=send_email(emails[k])
-        print(out_msg)
+        mymessage = emails[k]['message']
+        if len(mymessage)>0:
+            out_msg=send_email(emails[k])
+            print(out_msg)
+            print(emails[k]['message'])
     
 """
 CLEAN EVERYTHING UP.
