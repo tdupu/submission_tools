@@ -79,7 +79,7 @@ elif len(sys.argv)==3:
 elif len(sys.argv)==4:
     PATH_TO_DATA = sys.argv[1]
     IS_TEST = sys.argv[2]
-    DONT_SEND_EMAILS=sys.argv[3]
+    DONT_SEND_EMAILS=int(sys.argv[3])
     tmode(IS_TEST,PATH_TO_DATA)
     
 else:
@@ -242,10 +242,12 @@ print("dumping emails: " + path_to_emails + "\n")
 with open(path_to_emails,'w') as outfile:
     json.dump(emails,outfile)
 
+print("DONT_SEND_EMAILS:%s \n" % DONT_SEND_EMAILS)
 if DONT_SEND_EMAILS==0:
     print("sending emails: \n")
     for k in emails.keys():
-        send_email(emails[k])
+        out_msg=send_email(emails[k])
+        print(out_msg)
     
 """
 CLEAN EVERYTHING UP.
