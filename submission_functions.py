@@ -386,7 +386,7 @@ def submit_problem(user_id,assignment,problem,timestamp,path_to_data=PATH_TO_DAT
             S.save()
             message = """
             *submission %s, assignment %s, problem %s created. new. <br>
-            """ % (timestamp, assignment, problem)
+            """ % (new_submission_number, assignment, problem)
             write_file = 1
             
         elif n==1:
