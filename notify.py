@@ -181,10 +181,10 @@ for user in users:
     %s SERVER UPDATES FOR %s
     ##############################
     """ % (user, mydate_s,user)
-    message_parts['open_submissions']= "YOUR OPEN SUBMISSIONS:\n"
-    message_parts['new_closed_submissions'] = "NEW CLOSED SUBMISSIONS:\n"
-    message_parts['new_reviews'] = "REVIEWS YOU SUBMITTED:\n" #% user
-    message_parts['new_referee_requests'] = "REFEREE REQUESTS (see attachments for files): \n"
+    message_parts['open_submissions']= "\nYOUR OPEN SUBMISSIONS:\n"
+    message_parts['new_closed_submissions'] = "\nNEW CLOSED SUBMISSIONS:\n"
+    message_parts['new_reviews'] = "\nREVIEWS YOU SUBMITTED:\n" #% user
+    message_parts['new_referee_requests'] = "\nREFEREE REQUESTS (see attachments for files):\n"
     message_parts['complete_message'] = """
     
     

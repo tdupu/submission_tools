@@ -18,7 +18,7 @@ def review_assignment_time(sub):
 
 def print_submission_header(sub):
     #if sub['new_submission']==1:
-    message="    %s: assignment %s, problem %s, submit_time=%s, sent_for_review_time=%s \n" % (sub['submission_number'], sub['assignment'], sub['problem'], date(sub['submission_time']), review_assignment_time(sub))
+    message="    %s: assignment %s, problem %s, submitted %s, received %s \n" % (sub['submission_number'], sub['assignment'], sub['problem'], date(sub['submission_time']), review_assignment_time(sub))
     #else:
     #    message="    %s: assignment %s, problem %s , timestamp %s \n" % (sub['submission_number'], sub['assignment'], sub['problem'], date(sub['submission_time']))
     return message
