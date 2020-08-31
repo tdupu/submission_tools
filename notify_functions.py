@@ -1,12 +1,25 @@
 """
 PRINT STATEMENTS
 """
+import time
+import datetime
+
+def date(unixtime, format = '%m/%d/%Y %H:%M'):
+    d = datetime.datetime.fromtimestamp(unixtime)
+    return d.strftime(format)
+    
+def review_assignment_time(sub):
+    if len(sub['reviewer1'])>0:
+        return date(sub['reviewer1_assignment_time'])
+    else:
+        return "NA"
+    
 
 def print_submission_header(sub):
-    if sub['new_submission']==1:
-        message="    %s (new): assignment %s, problem %s \n" % (sub['submission_number'], sub['assignment'], sub['problem'])
-    else:
-        message="    %s: assignment %s, problem %s \n" % (sub['submission_number'], sub['assignment'], sub['problem'])
+    #if sub['new_submission']==1:
+    message="    %s: assignment %s, problem %s, submit_time=%s, sent_for_review_time=%s \n" % (sub['submission_number'], sub['assignment'], sub['problem'], date(sub['submission_time']), review_assignment_time(sub))
+    #else:
+    #    message="    %s: assignment %s, problem %s , timestamp %s \n" % (sub['submission_number'], sub['assignment'], sub['problem'], date(sub['submission_time']))
     return message
 
 def print_review(sub,j):

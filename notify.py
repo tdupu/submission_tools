@@ -181,10 +181,10 @@ for user in users:
     %s SERVER UPDATES FOR %s
     ##############################
     """ % (user, mydate_s,user)
-    message_parts['open_submissions']= "YOUR OPEN SUBMISSIONS: \n  "
-    message_parts['new_closed_submissions'] = "NEW CLOSED SUBMISSIONS: \n "
-    message_parts['new_reviews'] = "REVIEWS YOU SUBMITTED: \n " #% user
-    message_parts['new_referee_requests'] = "NEW REFEREE REQUESTS (see attachments for files): \n"
+    message_parts['open_submissions']= "YOUR OPEN SUBMISSIONS:\n"
+    message_parts['new_closed_submissions'] = "NEW CLOSED SUBMISSIONS:\n"
+    message_parts['new_reviews'] = "REVIEWS YOU SUBMITTED:\n" #% user
+    message_parts['new_referee_requests'] = "REFEREE REQUESTS (see attachments for files): \n"
     message_parts['complete_message'] = """
     
     
@@ -220,10 +220,11 @@ for user in users:
                     owner = sub['netid']
                     emails[user]['attachments'].append(print_filenames(sub,owner,PATH_TO_DATA + "uploads/"))
                         
-                elif int(sub['new_review%s' % j])==1:
+                if int(sub['new_review%s' % j])==1:
                     message_parts['new_reviews']+= print_submission_header(sub)
                     message_parts['new_reviews']+= print_review(sub,j)
                     num_revs+=1
+                
 
                         
         
