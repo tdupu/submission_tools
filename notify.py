@@ -184,7 +184,7 @@ for user in users:
     message_parts['open_submissions']= "\nYOUR OPEN SUBMISSIONS:\n"
     message_parts['new_closed_submissions'] = "\nNEW CLOSED SUBMISSIONS:\n"
     message_parts['new_reviews'] = "\nREVIEWS YOU SUBMITTED:\n" #% user
-    message_parts['new_referee_requests'] = "\nREFEREE REQUESTS (see attachments for files):\n"
+    message_parts['referee_requests'] = "\nREFEREE REQUESTS (see attachments for files):\n"
     message_parts['complete_message'] = """
     
     
@@ -212,20 +212,25 @@ for user in users:
             j = get_reviewer_index(user,sub,S)
             
             if j!=0:
+                has_printed=0
             
                 if int(sub['new_match'])==1:
+                    has_printed=1
                     num_requests+=1
-                    message_parts['new_referee_requests'] += print_submission_header(sub)
+                    message_parts['referee_requests'] += print_submission_header(sub)
                     num_requests +=1
                     owner = sub['netid']
                     emails[user]['attachments'].append(print_filenames(sub,owner,PATH_TO_DATA + "uploads/"))
                         
                 if int(sub['new_review%s' % j])==1:
+                    has_printed=1
                     message_parts['new_reviews']+= print_submission_header(sub)
                     message_parts['new_reviews']+= print_review(sub,j)
                     num_revs+=1
-                
-
+                    
+                if has_printed==0:
+                    num_requests+=1
+                    message_parts['referee_requests'] += print_submission_header(sub)
                         
         
     #BUILD MESSAGE
@@ -241,7 +246,7 @@ for user in users:
         message+=message_parts['new_reviews']
     
     if num_requests>0:
-        message+=message_parts['new_referee_requests']
+        message+=message_parts['referee_requests']
     
     if num_open+num_closed+num_revs+num_requests>0:
         emails[user]['message'] = message
