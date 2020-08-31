@@ -233,8 +233,9 @@ for user in users:
     
     if num_requests>0:
         message+=message_parts['new_referee_requests']
-        
-    emails[user]['message'] = message
+    
+    if num_open+num_closed+num_revs+num_requests>0:
+        emails[user]['message'] = message
 
 """
 EMAILS
