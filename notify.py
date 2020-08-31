@@ -229,8 +229,9 @@ for user in users:
                     num_revs+=1
                     
                 if has_printed==0:
-                    num_requests+=1
-                    message_parts['referee_requests'] += print_submission_header(sub)
+                    if sub['reviewer%s_score' % j]==-1:
+                        num_requests+=1
+                        message_parts['referee_requests'] += print_submission_header(sub)
                         
         
     #BUILD MESSAGE
