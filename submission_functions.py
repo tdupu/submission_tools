@@ -280,7 +280,8 @@ def authenticate(user_id, pass1, newpass1, newpass2,path_to_data=PATH_TO_DATA):
             if newpass1 == newpass2 and len(newpass1) >0:
                 new_entry = copyd(old_entry)
                 new_entry['password'] = newpass1
-                R.replace(old_entry,new_entry)
+                R.remove(old_entry)
+                R.append(new_entry)
                 R.save()
                 message = "new password has been set. <br>"
                 
