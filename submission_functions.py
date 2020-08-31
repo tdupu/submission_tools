@@ -224,6 +224,7 @@ def webmode(j,path_to_data=PATH_TO_DATA):
     
     Seem to be taken or something...
     """
+    j = int(j)
     f=open(path_to_data + 'variables.json','r')
     variables=json.load(f)
     f.close()
@@ -231,9 +232,9 @@ def webmode(j,path_to_data=PATH_TO_DATA):
     with open(path_to_data+'variables.json', 'w') as outfile:
         json.dump(variables,outfile)
     if j==0:
-        message = "webpage off. \n"
+        message = "server_down=0 \n"
     if j==1:
-        message = "webpage on. \n"
+        message = "server_down=1 \n"
     return message
     
 
