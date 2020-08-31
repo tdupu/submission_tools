@@ -120,6 +120,11 @@ for sub in new_completions:
 
 updated_subs = kill_repeats(S.get({"new_submission":1})+S.get({"new_completion":1})+S.get({"new_review1":1})+S.get({"new_review2":1}))
 
+print('updated submissions \n')
+for sub in updated_subs:
+    for k in sub.keys():
+        print("%s:%s" % (k, sub[k]))
+
 
 emails = {}
 
@@ -190,12 +195,12 @@ for user in users:
     for sub in updated_subs:
         if sub['netid']==user:
             
-            if int(sub['new_completion'])==0:
+            if sub['new_completion']==0:
                #add to open submission (this should be improved)
                message_parts['open_submissions'] += print_submission_header(sub)
                num_open+=1
                
-            elif int(sub['new_completion'])==1:
+            elif sub['new_completion']==1:
                #add to new closed submissions
                message_parts['new_closed_submissions'] += print_full_problem_report(sub)
                num_closed+=1
