@@ -351,9 +351,9 @@ def submit_problem(user_id,assignment,problem,timestamp,path_to_data=PATH_TO_DAT
         old_entries = S.get(query)
         n = len(old_entries)
         write_file = 1
+        new_submission_number = get_submission_count(path_to_data)
         
         if n==0:
-            new_submission_number = get_submission_count(path_to_data)
             new_entry = {}
             new_entry['netid'] = user_id
             new_entry['assignment'] = assignment
@@ -401,7 +401,6 @@ def submit_problem(user_id,assignment,problem,timestamp,path_to_data=PATH_TO_DAT
             for key in S.set_of_keys:
                 new_entry[key] = old_entry[key]
             
-            new_submission_number = get_submission_count(path_to_data)
             #new_entry['netid'] = user_id
             #new_entry['assignment'] = assignment
             #new_entry['problem'] = problem
