@@ -54,12 +54,12 @@ COURSE_NAME = get_course_name(PATH_TO_DATA)
 PATH_TO_UPLOADS = PATH_TO_DATA + '/uploads/'
 
 
-print("running new_submission.py... <br> ")
-print("test mode: %s <br>" % get_test_mode(PATH_TO_DATA))
-print("path to data: %s <br>" % PATH_TO_DATA)
-print("roster name: %s <br>" % ROSTER_NAME)
-print("course name: %s <br> <br>" % COURSE_NAME)
-print("###################### <br>")
+#print("running new_submission.py... <br> ")
+#print("test mode: %s <br>" % get_test_mode(PATH_TO_DATA))
+#print("path to data: %s <br>" % PATH_TO_DATA)
+#print("roster name: %s <br>" % ROSTER_NAME)
+#print("course name: %s <br> <br>" % COURSE_NAME)
+#print("###################### <br>")
 
 
 """
