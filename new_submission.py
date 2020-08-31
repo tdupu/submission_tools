@@ -39,7 +39,7 @@ if len(sys.argv)==2:
 
 if len(sys.argv)==3:
     PATH_TO_DATA = sys.argv[1]
-    is_test = sys.argv[2]
+    is_test = int(sys.argv[2])
     print("testing: %s \n" % is_test)
     tmode(is_test,PATH_TO_DATA)
 

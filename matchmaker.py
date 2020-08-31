@@ -46,7 +46,7 @@ elif len(sys.argv)>=2:
     PATH_TO_DATA = sys.argv[1]
     tmode(1,PATH_TO_DATA)
 elif len(sys.argv)==3:
-    is_test = sys.argv[2]
+    is_test = int(sys.argv[2])
     tmode(is_test,PATH_TO_DATA)
 else:
     tmode(1)
