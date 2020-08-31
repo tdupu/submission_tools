@@ -7,8 +7,8 @@ import datetime
 
 INSTALL_PATH = "/users/t/d/tdupuy/dev/submission_tools/"
 #INSTALL_PATH ='/Users/taylordupuy/Documents/web-development/dev/submission_tools/'
-sys.path.append(INSTALL_PATH + "../excel_tools/")
-sys.path.append(INSTALL_PATH + "../email_tools/")
+sys.path.append("/users/t/d/tdupuy/dev/excel_tools")
+sys.path.append("/users/t/d/tdupuy/dev/email_tools")
 
 from table_editor import SheetObject
 from table_functions import *
