@@ -190,12 +190,12 @@ for user in users:
     for sub in updated_subs:
         if sub['netid']==user:
             
-            if sub['new_completion']==0:
+            if int(sub['new_completion'])==0:
                #add to open submission (this should be improved)
                message_parts['open_submissions'] += print_submission_header(sub)
                num_open+=1
                
-            elif sub['new_completion']==1:
+            elif int(sub['new_completion'])==1:
                #add to new closed submissions
                message_parts['new_closed_submissions'] += print_full_problem_report(sub)
                num_closed+=1
@@ -205,14 +205,14 @@ for user in users:
             
             if j!=0:
             
-                if sub['new_match']==1:
+                if int(sub['new_match'])==1:
                     num_requests+=1
                     message_parts['new_referee_requests'] += print_submission_header(sub)
                     num_requests +=1
                     owner = sub['netid']
                     emails[user]['attachments'].append(print_filenames(sub,owner,PATH_TO_DATA + "uploads/"))
                         
-                elif sub['new_review%s' % j]==1:
+                elif int(sub['new_review%s' % j])==1:
                     message_parts['new_reviews']+= print_submission_header(sub)
                     message_parts['new_reviews']+= print_review(sub,j)
                     num_revs+=1
