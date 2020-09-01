@@ -269,9 +269,11 @@ def authenticate(user_id, pass1, newpass1, newpass2,path_to_data=PATH_TO_DATA):
     students = R.get({'netid':user_id})
     n = len(students)
     authenticated = 0
+    print(students)
     if n==0:
         message = "invalid user_id and password. <br>"
         authenticated = 0
+        print('n=0')
     if n==1:
         old_entry = students[0]
         password = old_entry['password']
@@ -289,6 +291,7 @@ def authenticate(user_id, pass1, newpass1, newpass2,path_to_data=PATH_TO_DATA):
             else:
                 message = "<i> %s upload report </i> <br>" % user_id
         else:
+            print('In the "else" case')
             authenticated = 0
             message = "invalid user_id and password. <br>"
                 
