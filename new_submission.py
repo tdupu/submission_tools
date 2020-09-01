@@ -31,11 +31,11 @@ HANDLE OPTIONS
 if len(sys.argv)==1:
     #PATH_TO_DATA = get_path_to_data()
     print("one arg")
-    tmode(1,PATH_TO_DATA)
+    #tmode(1,PATH_TO_DATA)
 
 if len(sys.argv)==2:
     PATH_TO_DATA = sys.argv[1]
-    tmode(1,PATH_TO_DATA)
+    #tmode(1,PATH_TO_DATA)
 
 if len(sys.argv)==3:
     PATH_TO_DATA = sys.argv[1]
