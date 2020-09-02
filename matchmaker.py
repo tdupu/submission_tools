@@ -41,15 +41,15 @@ PARSE INPUTS:
 """
 if len(sys.argv)==1:
     PATH_TO_DATA = get_path_to_data()
-    tmode(1,PATH_TO_DATA)
+    #tmode(1,PATH_TO_DATA)
 elif len(sys.argv)>=2:
     PATH_TO_DATA = sys.argv[1]
-    tmode(1,PATH_TO_DATA)
+    #tmode(1,PATH_TO_DATA)
 elif len(sys.argv)==3:
     is_test = int(sys.argv[2])
     tmode(is_test,PATH_TO_DATA)
 else:
-    tmode(1)
+    raise ValueError("matchmaker.py only accepts 3 or fewer options")
 
 roster_name = get_roster_name(PATH_TO_DATA)
 course_name = get_course_name(PATH_TO_DATA)
