@@ -31,11 +31,7 @@ def print_review(sub,j):
     if [1,2].count(j)==0:
         return ""
     else:
-        message = """
-                score: %s
-                comments: %s
-                
-        """ % (sub['reviewer%s_score' %j],sub['review%s' %j])
+        message = "    score: %s\n    comments: %s\n\n" % (sub['reviewer%s_score' %j],sub['review%s' %j])
     return message
         
 def print_final_score(sub):
