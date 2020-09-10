@@ -138,8 +138,8 @@ def score2(sub,S):
     reviewer2 = sub['reviewer2']
     s1 = sub['reviewer1_score']
     s2 = sub['reviewer2_score']
-    sub1 = S.get({'netid':reviewer1,'assignment':assignment,'problem':problem})
-    sub2 = S.get({'netid':reviewer1,'assignment':assignment,'problem':problem})
+    sub1 = S.get({'netid':reviewer1,'assignment':assignment,'problem':problem})[0]
+    sub2 = S.get({'netid':reviewer2,'assignment':assignment,'problem':problem})[0]
     r1 = sub1['total_score1']/10
     r2 = sub2['total_score2']/10
     if r1==0 and r2 ==0:
