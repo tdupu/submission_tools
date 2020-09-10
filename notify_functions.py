@@ -42,9 +42,9 @@ def print_final_score(sub):
             
 def print_full_problem_report(sub):
     message = print_submission_header(sub) + "\n"
-    message =+ "    reviewer 1 \n"
+    message += "    reviewer 1 \n"
     message += print_review(sub,1) + "\n"
-    message =+ "    reviewer 2 \n"
+    message += "    reviewer 2 \n"
     message += print_review(sub,2) + "\n"
     return message
     
