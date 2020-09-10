@@ -318,7 +318,7 @@ for sub in new_completions:
     """
     THIS IS BUGGY.
     """
-    mysub = S.get({"submission_number":sub["submission_number"]}) #to preserve scores
+    mysub = S.get({"submission_number":sub["submission_number"]})[0] #to preserve scores
     new_entry = copyd(mysub)
     new_entry["new_completion"]=0
     new_entry["new_review1"]=0
