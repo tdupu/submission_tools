@@ -315,9 +315,6 @@ for sub in new_matches:
     print("%s: new_match =0, submission_locked=1 \n" % sub["submission_number"])
 
 for sub in new_completions:
-    """
-    THIS IS BUGGY.
-    """
     mysub = S.get({"submission_number":sub["submission_number"]})[0] #to preserve scores
     new_entry = copyd(mysub)
     new_entry["new_completion"]=0

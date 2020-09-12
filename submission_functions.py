@@ -303,7 +303,7 @@ def authenticate(user_id, pass1, newpass1, newpass2,path_to_data=PATH_TO_DATA):
         
     return message, authenticated
 
-def is_valid_assignment(assignment, problem, timestamp, check_due_date=False, path_to_data=PATH_TO_DATA):
+def is_valid_assignment(assignment, problem, timestamp,path_to_data=PATH_TO_DATA, check_due_date=False):
     CONSTANT_DATA = get_constant_data(path_to_data)
     roster_name = CONSTANT_DATA['roster_name']
     A = SheetObject(path_to_data+roster_name,'assignments')
@@ -355,7 +355,7 @@ def submit_problem(user_id,assignment,problem,timestamp,path_to_data=PATH_TO_DAT
     roster_name = CONSTANT_DATA['roster_name']
     S = SheetObject(path_to_data + roster_name,'submissions')
     query = {'netid':user_id, 'assignment':assignment,'problem':problem}
-    if is_valid_assignment(assignment,problem,timestamp):
+    if is_valid_assignment(assignment,problem,timestamp,path_to_data):
         old_entries = S.get(query)
         n = len(old_entries)
         write_file = 1
