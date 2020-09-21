@@ -141,7 +141,7 @@ def score2(sub,S):
     sub1 = S.get({'netid':reviewer1,'assignment':assignment,'problem':problem})[0]
     sub2 = S.get({'netid':reviewer2,'assignment':assignment,'problem':problem})[0]
     r1 = sub1['total_score1']/10
-    r2 = sub2['total_score2']/10
+    r2 = sub2['total_score1']/10
     if r1==0 and r2 ==0:
         total_score2 = sub['total_score1']
         message = "r1=r2=0, to total_score1 = total_score2"
