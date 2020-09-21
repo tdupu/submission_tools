@@ -116,7 +116,8 @@ new_completions = S.get({"new_completion":1})
 
 for sub in new_completions:
     score1(sub,S)
-    score2(sub,S)
+    #score2(sub,S)
+    #completed
 
 updated_subs = kill_repeats(S.get({"new_submission":1})+S.get({"new_completion":1})+S.get({"new_review1":1})+S.get({"new_review2":1}))
 
@@ -182,7 +183,7 @@ for user in users:
     ##############################
     """ % (user, mydate_s,user)
     message_parts['open_submissions']= "\nYOUR OPEN SUBMISSIONS:\n"
-    message_parts['new_closed_submissions'] = "\nNEW CLOSED SUBMISSIONS:\n"
+    message_parts['new_closed_submissions'] = "\nNEW SCORED SUBMISSIONS  (unweighted):\n"
     message_parts['new_reviews'] = "\nREVIEWS YOU SUBMITTED:\n" #% user
     message_parts['referee_requests'] = "\nREFEREE REQUESTS (see attachments for files):\n"
     message_parts['complete_message'] = """
