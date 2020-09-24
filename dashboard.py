@@ -5,8 +5,8 @@ import datetime
 from statistics import *
 from decimal import Decimal
 
-#PATH_TO_EXCEL_TOOLS = "/Users/taylordupuy/Documents/web-development/dev/excel_tools"
-#sys.path.append(PATH_TO_EXCEL_TOOLS)
+INSTALL_PATH = '/users/t/d/tdupuy/dev/submission_tools/'
+#INSTALL_PATH ='/Users/taylordupuy/Documents/web-development/dev/submission_tools/'
 sys.path.append(INSTALL_PATH+"../excel_tools")
 
 from table_editor import SheetObject
