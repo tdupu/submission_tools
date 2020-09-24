@@ -138,7 +138,7 @@ course_name = get_course_name(PATH_TO_DATA)
 #
 # THIS NEEDS TO BE FIXED TO WORK MORE GENERALLY
 #
-PATH_TO_DASHBOARD = "/users/t/d/tdupuy/www-root/public/algebra-one/20/f/dashboard"
+PATH_TO_DASHBOARD = "/users/t/d/tdupuy/www-root/public/algebra-one/20/f/dashboard/"
 
 #turn off the server
 server_down =1
