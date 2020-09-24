@@ -11,6 +11,8 @@ sys.path.append(INSTALL_PATH+"../excel_tools")
 
 from table_editor import SheetObject
 from table_functions import *
+from matchmaker_functions import *
+from submission_functions import *
 
 def get_date(unixtime):
     return datetime.fromtimestamp(unixtime)
