@@ -193,10 +193,9 @@ for p0 in exercises:
     """
     total_scored2 = [m["total_score2"] for m in scored2]
     n = len(total_scored2)
-    plt.hist(total_scored2, bins=7)  # arguments are passed to np.histogram
-    plt.title(f"score2: assignment {ass}, problem {pro} (n={n})")
-    plt.show()
-    
+    #plt.hist(total_scored2, bins=7)  # arguments are passed to np.histogram
+    #plt.title(f"assignment {ass}, problem {pro} (n={n})")
+    #plt.show()
     plot2filename=score2_hist(p0,total_scored2,PATH_TO_DASHBOARD)
     
     #average distance
