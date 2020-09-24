@@ -115,13 +115,39 @@ def get_times(subs):
         review_times.append(treview2)
     return {"review_times":review_times,"matching_times":matching_times}
 
-ALGEBRA_PATH = "/Users/taylordupuy/Documents/web-development/data/algebra-one/20/f/"
-PATH_TO_DASHBOARD = "/Users/taylordupuy/Documents/web-development/public/algebra-one/20/f/" + "dashboard/"
+###############################
+###############################
+
+if len(sys.argv)==1:
+    PATH_TO_DATA = get_path_to_data()
+    #tmode(1,PATH_TO_DATA)
+elif len(sys.argv)>=2:
+    PATH_TO_DATA = sys.argv[1]
+    #tmode(1,PATH_TO_DATA)
+elif len(sys.argv)==3:
+    is_test = int(sys.argv[2])
+    tmode(is_test,PATH_TO_DATA)
+else:
+    raise ValueError("dashboard.py only accepts 3 or fewer options")
+
+roster_name = get_roster_name(PATH_TO_DATA)
+course_name = get_course_name(PATH_TO_DATA)
+
+#
+# THIS NEEDS TO BE FIXED TO WORK MORE GENERALLY
+#
+PATH_TO_DASHBOARD = "/users/t/d/tdupuy/www-root/public/algebra-one/20/f/dashboard"
+
+#turn off the server
+server_down =1
+out_msg=webmode(server_down,PATH_TO_DATA)
+print(out_msg)
+
 
 today = datetime.date.today()
 todays = today.strftime("%B %d, %Y")
 
-path_to_sheet = ALGEBRA_PATH + "roster.xlsx"
+path_to_sheet = PATH_TO_DATA + "roster.xlsx"
 S = SheetObject(path_to_sheet,"submissions")
 P = SheetObject(path_to_sheet,"assignments")
 U = SheetObject(path_to_sheet,"roster")
@@ -294,3 +320,10 @@ html_page = HTML_START + html_table + caption + image_table + HTML_END
 f = open(PATH_TO_DASHBOARD+"dashboard.html", "w")
 f.write(html_page)
 f.close()
+
+"""
+TURN WEBPAGE BACK ON
+"""
+server_down=0
+out_msg=webmode(server_down,PATH_TO_DATA)
+print(out_msg)
