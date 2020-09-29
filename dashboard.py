@@ -62,6 +62,7 @@ def save_hist(subs,key,S,filename,plot_title=""):
     plt.hist(data,bins=7)
     plt.title(plot_title)
     plt.savefig(filename)
+    plt.clf()
 
 def score1_hist(p0,scored1):
     """
