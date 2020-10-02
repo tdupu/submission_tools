@@ -236,7 +236,10 @@ for p0 in exercises:
     if len(total_scored2)>0:
         mean0=mean(total_scored2)
         med0=median(total_scored2)
-        std0=stdev(total_scored2)
+        if total_scored2>1:
+            std0=stdev(total_scored2)
+        else:
+            std0=0
         time_data=get_times(scored2)
         rt0=mean(time_data['review_times'])
         mt0=mean(time_data['matching_times'])
