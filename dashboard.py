@@ -1,9 +1,6 @@
 import sys
 import numpy as np
-import matplotlib.pyplot as plt
 import datetime
-from statistics import *
-from decimal import Decimal
 
 INSTALL_PATH = '/users/t/d/tdupuy/dev/submission_tools/'
 #INSTALL_PATH ='/Users/taylordupuy/Documents/web-development/dev/submission_tools/'
@@ -184,8 +181,7 @@ for p0 in exercises:
     
     ass=p0["assignment"]
     pro=p0["problem"]
-    
-    matched = S.get({"assignment":p0["assignment"], "problem":p0["problem"],"submission_locked":1})
+
     
     scored1 = []
     for m in matched:
@@ -202,22 +198,29 @@ for p0 in exercises:
         reviewer2 = m['reviewer2']
         s1 = m['reviewer1_score']
         s2 = m['reviewer2_score']
-        search1=searchd(scored1,{'netid':reviewer1})
-        search2=searchd(scored1,{'netid':reviewer2})
-        if len(search1)>0 and len(search2)>0:
-            mnew = copyd(m)
-            sub1 = search1[0]
-            sub2 = search2[0]
-            r1=sub1['total_score1']
-            r2=sub2['total_score1']
-            w1 = float(r1/(r1+r2))
-            w2 = float(r2/(r1+r2))
-            ts2=w1*s1+w2*s2
-            #print(f"s1={s1},s2={s2},r1={r1},r2={r2},w1={w1},w2={w2},ts2={ts2},w1+w2={w1+w2}")
-            mnew['total_score2']=ts2
-            scored2.append(mnew)
+        if m['closed']==0:
+            search1=searchd(scored1,{'netid':reviewer1})
+            search2=searchd(scored1,{'netid':reviewer2})
             
+            if len(search1)>0 and len(search2)>0:
+                mnew = copyd(m)
+                sub1 = search1[0]
+                sub2 = search2[0]
+                r1=sub1['total_score1']
+                r2=sub2['total_score1']
+                w1 = float(r1/(r1+r2))
+                w2 = float(r2/(r1+r2))
+                ts2=w1*s1+w2*s2
+            #print(f"s1={s1},s2={s2},r1={r1},r2={r2},w1={w1},w2={w2},ts2={ts2},w1+w2={w1+w2}")
+                mnew['total_score2']=ts2
+                mnew['closed']=1
+                mnew['w1']=w1
+                mnew['w2']=w2
+                scored2.append(mnew)
+
     update(S,scored2)
+    S.save()
+    
     """
     Histogram
     """
@@ -306,8 +309,7 @@ for p0 in exercises:
     """
     
     end_of_table="</table>"
-    
-S.save()
+
 html_table = start_of_table+mid_of_table+end_of_table
 
 caption = """
