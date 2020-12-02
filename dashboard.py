@@ -1,6 +1,9 @@
 import sys
 import numpy as np
+import matplotlib.pyplot as plt
 import datetime
+from statistics import *
+from decimal import Decimal
 
 INSTALL_PATH = '/users/t/d/tdupuy/dev/submission_tools/'
 #INSTALL_PATH ='/Users/taylordupuy/Documents/web-development/dev/submission_tools/'
