@@ -1,6 +1,6 @@
 import sys
 import numpy as np
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import datetime
 from statistics import *
 from decimal import Decimal
@@ -227,117 +227,8 @@ for p0 in exercises:
     update(S,scored2)
     S.save()
     
-    """
-    Histogram
-    """
-    total_scored2 = [m["total_score2"] for m in scored2]
-    n = len(total_scored2)
-    #plt.hist(total_scored2, bins=7)  # arguments are passed to np.histogram
-    #plt.title(f"assignment {ass}, problem {pro} (n={n})")
-    #plt.show()
-    plot2filename=score2_hist(p0,total_scored2,PATH_TO_DASHBOARD)
-    
-    #average distance
-    scorechanges=[]
-    for m in scored2:
-        scorechanges.append([m['total_score1']-m['total_score2']])
-    
-    if len(total_scored2)>0:
-        mean0=mean(total_scored2)
-        med0=median(total_scored2)
-        if len(total_scored2)>1:
-            std0=stdev(total_scored2)
-        else:
-            std0=0
-        time_data=get_times(scored2)
-        rt0=mean(time_data['review_times'])
-        mt0=mean(time_data['matching_times'])
-    
-    else:
-        mean0=0
-        med0=0
-        std0=0
-        rt0=0
-        mt0=0
-        
-    
-    html_image0=f'<img src="{plot2filename}" alt="{plot2filename}" />'
-    
-    start_of_table="""
-    <table>
-    <tr>
-    <th>(ass,pro)</th>
-    <th>subs</th>
-    <th>not subbed</th>
-    <th>waiting</th>
-    <th>matches</th>
-    <th>completed</th>
-    <th>match time</th>
-    <th>rev time </th>
-    <th>mean</th>
-    <th>median</th>
-    <th>std</th>
-    </tr>"""
-    
-    mid_of_table= mid_of_table+f"""
-    <tr>
-    <td> ({ass},{pro}) </td>
-    <td>  {num_submitted} </td>
-    <td>  {num_available} </td>
-    <td>  {num_waiting} </td>
-    <td>  {num_matched} </td>
-    <td> {n} </td>
-    <td>  {clean_dec(mt0)} </td>
-    <td>  {clean_dec(rt0)} </td>
-    <td>  {clean_dec(mean0)} </td>
-    <td>  {clean_dec(med0)} </td>
-    <td>  {clean_dec(std0)} </td>
-    </tr>
-    """
-    mid_image_table = mid_image_table+f"<tr> {html_image0} </tr>"
+#TURN WEBPAGE BACK ON
 
-    TITLE = f"SUBMISSION DASHBOARD (updated: {todays})"
-
-    HTML_START=f"""
-    <!DOCTYPE html>
-    <html lang="en">
-      <head>
-        <meta charset="utf-8">
-        <title> {TITLE} </title>
-        <link rel="stylesheet" href="styles.css">
-      </head>
-      <h1> {TITLE} </h1>
-      <body>
-      """
-    HTML_END="""
-    </body>
-    </html>
-    """
-    
-    end_of_table="</table>"
-
-html_table = start_of_table+mid_of_table+end_of_table
-
-caption = """
-<p>
-NOTES: <br>
-match time,review time computed in days; completed submissions used (meaning the second score with the weighted average has been computed).<br>
-submitted, available, waiting, and matched are all the number of people currently in each category for this problem.
-</p>
-
-<h1> Histograms of Scores</h1>
-"""
-
-image_table = "<center> <table>" + mid_image_table + end_of_table +"</center>"
-html_page = HTML_START + html_table + caption + image_table + HTML_END
-    
-f = open(PATH_TO_DASHBOARD+"dashboard.html", "w")
-f.write(html_page)
-f.close()
-
-"""
-TURN WEBPAGE BACK ON
-"""
 server_down=0
 out_msg=webmode(server_down,PATH_TO_DATA)
 print(out_msg)
