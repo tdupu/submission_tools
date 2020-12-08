@@ -5,10 +5,10 @@ import datetime
 from statistics import *
 from decimal import Decimal
 
-#INSTALL_PATH = '/users/t/d/tdupuy/dev/submission_tools/'
-#PATH_TO_DASHBOARD = "/users/t/d/tdupuy/www-root/public/algebra-one/20/f/dashboard/"
-INSTALL_PATH ='/Users/taylordupuy/Documents/web-development/dev/submission_tools/'
-PATH_TO_DASHBOARD="/Users/taylordupuy/Documents/web-development/data/algebra-one/20/f/"
+INSTALL_PATH = '/users/t/d/tdupuy/dev/submission_tools/'
+PATH_TO_DASHBOARD = "/users/t/d/tdupuy/www-root/public/algebra-one/20/f/dashboard/"
+#INSTALL_PATH ='/Users/taylordupuy/Documents/web-development/dev/submission_tools/'
+#PATH_TO_DASHBOARD="/Users/taylordupuy/Documents/web-development/data/algebra-one/20/f/"
 
 sys.path.append(INSTALL_PATH+"../excel_tools")
 
