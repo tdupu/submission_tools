@@ -390,6 +390,8 @@ def submit_problem(user_id,assignment,problem,timestamp,path_to_data=PATH_TO_DAT
             new_entry['new_review1']=0
             new_entry['new_review2']=0
             new_entry['new_completion']=0
+            new_entry['w1']=1
+            new_entry['w2']=1
             S.append(new_entry)
             S.save()
             message = """
